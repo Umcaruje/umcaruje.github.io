@@ -95,3 +95,12 @@
 .btn-yahoo:active,.btn-yahoo.active,.open .dropdown-toggle.btn-yahoo{background-image:none}
 .btn-yahoo.disabled,.btn-yahoo[disabled],fieldset[disabled] .btn-yahoo,.btn-yahoo.disabled:hover,.btn-yahoo[disabled]:hover,fieldset[disabled] .btn-yahoo:hover,.btn-yahoo.disabled:focus,.btn-yahoo[disabled]:focus,fieldset[disabled] .btn-yahoo:focus,.btn-yahoo.disabled:active,.btn-yahoo[disabled]:active,fieldset[disabled] .btn-yahoo:active,.btn-yahoo.disabled.active,.btn-yahoo[disabled].active,fieldset[disabled] .btn-yahoo.active{background-color:#720e9e;border-color:rgba(0,0,0,0.2)}
 .btn-yahoo .badge{color:#720e9e;background-color:#fff}
+.btn-spotify{color:#fff;background-color:#80B719;border-color:rgba(0,0,0,0.2)}.btn-spotify:hover,.btn-spotify:focus,.btn-spotify:active,.btn-spotify.active,.open .dropdown-toggle.btn-spotify{color:#fff;background-color:#80B719;border-color:rgba(0,0,0,0.2)}
+.btn-spotify:active,.btn-spotify.active,.open .dropdown-toggle.btn-spotify{background-image:none}
+.btn-spotify.disabled,.btn-spotify[disabled],fieldset[disabled] .btn-spotify,.btn-spotify.disabled:hover,.btn-spotify[disabled]:hover,fieldset[disabled] .btn-spotify:hover,.btn-spotify.disabled:focus,.btn-spotify[disabled]:focus,fieldset[disabled] .btn-spotify:focus,.btn-spotify.disabled:active,.btn-spotify[disabled]:active,fieldset[disabled] .btn-spotify:active,.btn-spotify.disabled.active,.btn-spotify[disabled].active,fieldset[disabled] .btn-spotify.active{background-color:#80B719;border-color:rgba(0,0,0,0.2)}
+.btn-spotify .badge{color:#80B719;background-color:#fff}
+
+.btn-youtube{color:#fff;background-color:#CD332D;border-color:rgba(0,0,0,0.2)}.btn-youtube:hover,.btn-youtube:focus,.btn-youtube:active,.btn-youtube.active,.open .dropdown-toggle.btn-youtube{color:#fff;background-color:#CD332D;border-color:rgba(0,0,0,0.2)}
+.btn-youtube:active,.btn-youtube.active,.open .dropdown-toggle.btn-youtube{background-image:none}
+.btn-youtube.disabled,.btn-youtube[disabled],fieldset[disabled] .btn-youtube,.btn-youtube.disabled:hover,.btn-youtube[disabled]:hover,fieldset[disabled] .btn-youtube:hover,.btn-youtube.disabled:focus,.btn-youtube[disabled]:focus,fieldset[disabled] .btn-youtube:focus,.btn-youtube.disabled:active,.btn-youtube[disabled]:active,fieldset[disabled] .btn-youtube:active,.btn-youtube.disabled.active,.btn-youtube[disabled].active,fieldset[disabled] .btn-youtube.active{background-color:#CD332D;border-color:rgba(0,0,0,0.2)}
+.btn-youtube .badge{color:#CD332D;background-color:#fff}
