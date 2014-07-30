@@ -104,3 +104,8 @@
 .btn-youtube:active,.btn-youtube.active,.open .dropdown-toggle.btn-youtube{background-image:none}
 .btn-youtube.disabled,.btn-youtube[disabled],fieldset[disabled] .btn-youtube,.btn-youtube.disabled:hover,.btn-youtube[disabled]:hover,fieldset[disabled] .btn-youtube:hover,.btn-youtube.disabled:focus,.btn-youtube[disabled]:focus,fieldset[disabled] .btn-youtube:focus,.btn-youtube.disabled:active,.btn-youtube[disabled]:active,fieldset[disabled] .btn-youtube:active,.btn-youtube.disabled.active,.btn-youtube[disabled].active,fieldset[disabled] .btn-youtube.active{background-color:#CD332D;border-color:rgba(0,0,0,0.2)}
 .btn-youtube .badge{color:#CD332D;background-color:#fff}
+
+.btn-email{color:#fff;background-color:#f5de2d;border-color:rgba(0,0,0,0.2)}.btn-email:hover,.btn-email:focus,.btn-email:active,.btn-email.active,.open .dropdown-toggle.btn-email{color:#fff;background-color:#f5de2d;border-color:rgba(0,0,0,0.2)}
+.btn-email:active,.btn-email.active,.open .dropdown-toggle.btn-email{background-image:none}
+.btn-email.disabled,.btn-email[disabled],fieldset[disabled] .btn-email,.btn-email.disabled:hover,.btn-email[disabled]:hover,fieldset[disabled] .btn-email:hover,.btn-email.disabled:focus,.btn-email[disabled]:focus,fieldset[disabled] .btn-email:focus,.btn-email.disabled:active,.btn-email[disabled]:active,fieldset[disabled] .btn-email:active,.btn-email.disabled.active,.btn-email[disabled].active,fieldset[disabled] .btn-email.active{background-color:#f5de2d;border-color:rgba(0,0,0,0.2)}
+.btn-email .badge{color:#f5de2d;background-color:#fff}
