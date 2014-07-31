@@ -30,7 +30,7 @@ body {
   background-image: url('/images/Background.png');
   background-color: #002a5c;
   background-repeat:no-repeat;
-  background-attachment:fixed;
+  background-attachment: fixed;
   background-position:center top;
 }
 body {
@@ -161,18 +161,26 @@ body {
 }
     .fixed {
         position: fixed;
+        z-index: 999;
+        max-width: 730px;
+        min-width: 700px;
 }
 
 @media (min-width: 992px) {
   .masthead,
   .mastfoot,
   .cover-container {
-    width: 700px;
-  }
+    width: 730px
 }
 
 .blog {
-    text-align: left
+    text-align: left;
+    overflow: hidden;
+    margin-top: 60px;
+    position: static;
+
+
+        {
 
 
 
