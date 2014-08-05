@@ -183,5 +183,8 @@ body {
     overflow: hidden;
     padding-top: 80px;
 
- {
+}
+.leftest-text {
+text-align: left;
+}
 
