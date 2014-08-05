@@ -5,10 +5,10 @@
 /* Links */
 a,
 a:focus{
- color: #c0eafc;
+ color: #fff3ad;
 }
 a:hover {
-  color: #024eaa;
+  color: #c0eafc;
 }
 
 /* Custom default button */
@@ -188,5 +188,10 @@ body {
 }
 .leftest-text {
 text-align: left;
+}
+.nolinks{
+ color: #fff;
+ {
+}
 }
 
