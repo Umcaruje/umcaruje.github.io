@@ -192,7 +192,33 @@ text-align: left;
 .nolinks{
  color: #fff;
 }
-.blogimage {
- text-align: left;
+.rightest-text {
+text-align: right;
 }
+.archive{
+display: block;
+}
+.archive span{
+display: block;
+float: right
+}
+.blogimageL {
+text-align: left;
+position: absolute;
+float: left
+}
+.blogimageR {
+text-align: right;
+float: right;
+}
+.border {
+  border: 1px solid #fcfcfc;
+  border-radius: 7px;
+  -webkit-transition: all .2s ease-in-out;
+       -o-transition: all .2s ease-in-out;
+          transition: all .2s ease-in-out;
+}
+}
+
+
 
