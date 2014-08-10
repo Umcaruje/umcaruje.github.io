@@ -302,7 +302,10 @@ float: right;
        -o-transition: all .2s ease-in-out;
           transition: all .2s ease-in-out;
 }
-
+.space{
+    margin-left: 8px;
+    margin-right: 8px;
+}
 
 
 
