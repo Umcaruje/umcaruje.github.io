@@ -89,7 +89,7 @@ body {
 /* Links */
 a,
 a:focus{
- color: #fff3ad;
+ color: rgb(252, 191, 93);
 }
 a:hover {
   color: #c0eafc;
