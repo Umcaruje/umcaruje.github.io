@@ -258,6 +258,7 @@ body {
 		width: 100%;
 		/* Must be percentage or pixels for horizontal alignment */
 	}
+}
 	.navigation {
 		max-width: 800px;
 		vertical-align: middle;
