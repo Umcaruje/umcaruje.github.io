@@ -258,11 +258,7 @@ body {
 		width: 100%;
 		/* Must be percentage or pixels for horizontal alignment */
 	}
-}
-	.navigation {
-		vertical-align: middle;
-	}
-	.fixed {
+		.fixed {
 		position: fixed;
 		z-index: 999;
 		max-width: 730px;
@@ -273,6 +269,14 @@ body {
 		background-attachment: fixed;
 		background-position: center;
 	}
+	.blog {
+	padding-top: 80px;
+	}
+}
+	.navigation {
+		vertical-align: middle;
+	}
+
 	@media (min-width: 992px) {
 		.container, .masthead, .mastfoot, .cover-container {
 			width: 730px
@@ -281,7 +285,6 @@ body {
 	.blog {
 		text-align: left;
 		overflow: hidden;
-		padding-top: 80px;
 	}
 	.leftest-text {
 		text-align: left;
