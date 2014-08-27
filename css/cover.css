@@ -50,19 +50,6 @@ body {
 	.navigation {
 		float: right !important;
 	}
-	.datfooter {
-		position: fixed;
-		bottom: 0;
-		text-align: center;
-		margin: 0 auto;
-		width: 770px;
-		min-width: 770px;
-	}
-	@media (max-height: 500px) {
-		.datfooter {
-			position: static !important;
-		}
-}
 }
 .container-narrow > hr {
 	margin: 30px 0;
@@ -263,6 +250,18 @@ body {
 	.blog {
 		padding-top: 80px;
 	}
+	.datfooter {
+		position: fixed;
+		bottom: 0;
+		text-align: center;
+		margin: 0 auto;
+		width: 770px;
+		min-width: 770px;
+	}
+	@media (max-height: 500px) {
+		.datfooter {
+			position: static !important;
+		}
 }
 .blog {
 	text-align: left;
