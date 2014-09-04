@@ -165,17 +165,7 @@ body {
 		max-width: 327px;
 	}
 }
-/*
- * Cover
- */
 
-.cover {
-	padding: 0 20px;
-}
-.cover .btn-lg {
-	padding: 10px 20px;
-	font-weight: bold;
-}
 /*
  * Affix and center
  */
@@ -258,5 +248,5 @@ body {
 	margin-right: 8px;
 }
 .monospace {
-	font-family: 'Ubuntu Mono', 'monospace' ;
+	font-family: 'Ubuntu Mono', ;
 }
