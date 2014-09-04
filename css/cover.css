@@ -1,13 +1,10 @@
-/*
- * Jumbotron here I come
- */
+@import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono|Open+Sans:400italic,700,400&subset=latin,latin-ext);
 
 /* Space out content a bit */
-
 body {
 	position: relative;
 	padding-bottom: 20px;
-	font-family: 'Inconsolata', ;
+	font-family: 'Open Sans', sans-serif;
 }
 /* Everything but the jumbotron gets side spacing for mobile first views */
 
@@ -55,30 +52,11 @@ body {
 .container-narrow > hr {
 	margin: 30px 0;
 }
-/* Main marketing message and sign up button */
-
-.jumbotron {
-	text-align: center;
-	border-bottom: 1px solid #f7f7f7;
-}
-.jumbotron .btn {
-	padding: 14px 24px;
-	font-size: 21px;
-}
-/* Supporting marketing content */
-
-.marketing {
-	margin: 40px 0;
-}
-.marketing p + h4 {
-	margin-top: 28px;
-}
 /* Responsive: Portrait tablets and up */
 
 @media screen and (min-width: 768px) {
 	/* Remove the padding we set earlier */
 	.header,
-	.marketing,
 	.footer {
 		padding-right: 0;
 		padding-left: 0;
@@ -102,17 +80,6 @@ a:focus {
 a:hover {
 	color: #c0eafc;
 }
-/* Custom default button */
-
-.btn-default,
-.btn-default:hover,
-.btn-default:focus {
-	color: #333;
-	text-shadow: none;
-	/* Prevent inheritence from `body` */
-	background-color: #fff;
-	border: 1px solid #fff;
-}
 /*
  * Base structure
  */
@@ -130,21 +97,6 @@ body {
 	color: #fbfcef;
 	text-align: center;
 	text-shadow: 0 1px 3px rgba(0, 0, 0, .5);
-}
-/* Extra markup and styles for table-esque vertical and horizontal centering */
-
-.site-wrapper {
-	display: table;
-	width: 100%;
-	height: 100%;
-	/* For at least Firefox */
-	min-height: 100%;
-	-webkit-box-shadow: inset 0 0 100px rgba(0, 0, 0, .5);
-	box-shadow: inset 0 0 100px rgba(0, 0, 0, .5);
-}
-.site-wrapper-inner {
-	display: table-cell;
-	vertical-align: top;
 }
 .cover-container {
 	margin-right: auto;
@@ -263,6 +215,7 @@ body {
 		.datfooter {
 			position: static !important;
 		}
+	}
 }
 .blog {
 	text-align: left;
@@ -305,6 +258,5 @@ body {
 	margin-right: 8px;
 }
 .monospace {
-	font-family: 'Share Tech Mono', ;
+	font-family: 'Ubuntu Mono', 'monospace' ;
 }
-
