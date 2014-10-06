@@ -6,7 +6,6 @@
 body {
 	position: relative;
 	padding-bottom: 20px;
-	font-family: 'Open Sans' !important;
 }
 /* Everything but the jumbotron gets side spacing for mobile first views */
 
@@ -194,5 +193,8 @@ body {
 	margin-right: 8px;
 }
 .monospace {
-	font-family: 'Share Tech Mono' !important;
+	font-family: 'Share Tech Mono';
+}
+body {
+	font-family: 'Open Sans';
 }
