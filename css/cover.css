@@ -15,18 +15,7 @@ body {
 }
 /* Custom page header */
 
-.header {
-	border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
 
-.header h3 {
-	padding-bottom: 19px;
-	margin-top: 0;
-	margin-bottom: 0;
-	line-height: 40px;
-	top: 0
-}
 .navigation {
 	float: none;
 }
@@ -61,6 +50,18 @@ body {
 		margin-bottom: 5px;
 		padding-top: 20px;
 	}
+	.header {
+	border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+
+.header h3 {
+	padding-bottom: 19px;
+	margin-top: 0;
+	margin-bottom: 0;
+	line-height: 40px;
+	top: 0
+}
 }
 /* Links */
 
@@ -197,4 +198,9 @@ body {
 }
 body {
 	font-family: 'Open Sans';
+}
+.jumpup a:hover {
+	padding-bottom: 10px;
+	color: #f00;
+
 }

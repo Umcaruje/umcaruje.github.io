@@ -1,0 +1,60 @@
+/* Simple Flat Social buttons */
+
+.snav {
+	padding: 0;
+}
+.snav ul {
+   list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+}
+.snav li {
+	float: left;
+}
+
+.sbtn {
+
+	display: block;
+	color: #fff;
+	width: 40px;
+	height: 40px;
+	background-color: #6d3333;
+	font-size: 30px;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	line-height: 40px;
+	border-radius: 1px;
+	margin: 2px;
+
+}
+.sbtn:hover {
+	color: #fff;
+	width: 42px;
+	height: 42px;
+	margin: 1px;
+	font-size: 32px;
+	line-height: 42px;
+}
+.sbtn-home {
+	background-color: #2d75f8 ;
+}
+.sbtn-blog {
+	background-color: #0088CC ;
+}
+.sbtn-github {
+	background-color: #444c50 ;
+}
+.sbtn-soundcloud {
+	background-color: #FF6600 ;
+}
+.sbtn-youtube {
+	background-color: #bb0000;
+}
+.sbtn-spotify {
+	background-color: #80B719 ;
+}
+.sbtn-email {
+	background-color: #F2D523;
+}
