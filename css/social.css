@@ -4,17 +4,14 @@
 	padding: 0;
 }
 .snav ul {
-   list-style-type: none;
-    margin: 0;
-    padding: 0;
-
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 .snav li {
 	float: left;
 }
-
 .sbtn {
-
 	display: block;
 	color: #fff;
 	width: 40px;
@@ -27,7 +24,6 @@
 	line-height: 40px;
 	border-radius: 1px;
 	margin: 2px;
-
 }
 .sbtn:hover {
 	color: #fff;
@@ -38,22 +34,22 @@
 	line-height: 42px;
 }
 .sbtn-home {
-	background-color: #2d75f8 ;
+	background-color: #2d75f8;
 }
 .sbtn-blog {
-	background-color: #0088CC ;
+	background-color: #0088CC;
 }
 .sbtn-github {
-	background-color: #444c50 ;
+	background-color: #444c50;
 }
 .sbtn-soundcloud {
-	background-color: #FF6600 ;
+	background-color: #FF6600;
 }
 .sbtn-youtube {
 	background-color: #bb0000;
 }
 .sbtn-spotify {
-	background-color: #80B719 ;
+	background-color: #80B719;
 }
 .sbtn-email {
 	background-color: #F2D523;
