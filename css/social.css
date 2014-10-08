@@ -76,3 +76,12 @@
 .sbtn-music {
 	background-color: #4c8ea7;
 }
+/* So responsive */
+@media (max-width: 768px) {
+	.snav {
+		margin: 0 auto;
+		max-width: 352px;
+		height: 42px;
+		max-height: 82px;
+	}
+}

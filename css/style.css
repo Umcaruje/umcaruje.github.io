@@ -7,19 +7,14 @@ body {
 	position: relative;
 	padding-bottom: 20px;
 }
-/* Everything but the jumbotron gets side spacing for mobile first views */
-
 .header {
 	padding-right: 15px;
 	padding-left: 15px;
 }
-/* Custom page header */
-
-
 .navigation {
 	float: none;
 }
-/* Paragraphz*/
+/* Paragraphz */
 
 .standout {
 	font-size: 22px;
@@ -36,6 +31,9 @@ body {
 	.navigation {
 		float: right !important;
 	}
+	.header {
+		border-bottom: 1px solid #e5e5e5;
+	}
 }
 /* Responsive: Portrait tablets and up */
 
@@ -50,8 +48,6 @@ body {
 		margin-bottom: 5px;
 		padding-top: 20px;
 	}
-	.header {
-	border-bottom: 1px solid #e5e5e5;
 }
 /* Make the masthead heading the same height as the navigation */
 
@@ -62,7 +58,6 @@ body {
 	line-height: 40px;
 	top: 0
 }
-}
 /* Links */
 
 a,
@@ -71,11 +66,8 @@ a:focus {
 }
 a:hover {
 	color: #c0eafc;
+	text-decoration: none;
 }
-/*
- * Base structure
- */
-
 html,
 body {
 	height: 100%;
@@ -84,14 +76,9 @@ body {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-position: center;
-}
-body {
 	color: #f0f0f0;
 	text-align: center;
-	/*text-shadow: 0 1px 3px rgba(0, 0, 0, .5);*/
 }
-/* Padding for spacing */
-
 .inner {
 	padding: 30px;
 }
@@ -102,10 +89,6 @@ body {
 	}
 	.nolinks {
 		color: #fff;
-	}
-	.navigation {
-		margin: 0 auto !important;
-		max-width: 352px;
 	}
 	.standout {
 		font-size: 18px;
@@ -145,6 +128,9 @@ body {
 		margin: 0 auto;
 		width: 770px;
 		min-width: 770px;
+	}
+	.header {
+		border-bottom: 1px solid #e5e5e5;
 	}
 	@media (max-height: 500px) {
 		.datfooter {
