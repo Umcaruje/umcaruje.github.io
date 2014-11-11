@@ -3,6 +3,12 @@
 
 /* Space out content a bit */
 
+* {
+  margin: 0;
+}
+html, body {
+	height: 100%;
+}
 body {
 	position: relative;
 	padding-bottom: 20px;
@@ -58,6 +64,27 @@ body {
 	line-height: 40px;
 	top: 0
 }
+/*Sticky Footer*/
+.datfooter {
+	height: 90px;
+	background-color: #002a5c;
+	padding: 30px;
+	margin: 0 auto;
+	vertical-align: middle;
+	text-overflow: clip;
+	display: block;
+}
+.container {
+	min-height: 100%;
+	margin-bottom: -80px;
+}
+.container:after {
+	content: "";
+	display: block;
+	height: 80px;
+}
+
+
 /* Links */
 
 a,
@@ -86,9 +113,6 @@ body {
 	.header {
 		margin-top: 20px;
 		padding-bottom: 20px;
-	}
-	.nolinks {
-		color: #fff;
 	}
 	.standout {
 		font-size: 18px;
@@ -121,21 +145,8 @@ body {
 	.blog {
 		padding-top: 80px;
 	}
-	.datfooter {
-		position: fixed;
-		bottom: 0;
-		text-align: center;
-		margin: 0 auto;
-		width: 770px;
-		min-width: 770px;
-	}
 	.header {
 		border-bottom: 1px solid #e5e5e5;
-	}
-	@media (max-height: 500px) {
-		.datfooter {
-			position: static !important;
-		}
 	}
 }
 .blog {
@@ -145,7 +156,9 @@ body {
 .leftest-text {
 	text-align: left;
 }
-.nolinks {
+.nolinks,
+.nolinks a:link,
+.nolinks a:visited {
 	color: #e6e6e6;
 }
 .rightest-text {
