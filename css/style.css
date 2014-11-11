@@ -1,11 +1,6 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700&subset=latin,latin-ext);
 @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono&subset=latin,latin-ext);
 
-/* Space out content a bit */
-
-* {
-  margin: 0;
-}
 html, body {
 	height: 100%;
 }
@@ -141,9 +136,6 @@ body {
 		background-repeat: no-repeat;
 		background-attachment: fixed;
 		background-position: center;
-	}
-	.blog {
-		padding-top: 80px;
 	}
 	.header {
 		border-bottom: 1px solid #e5e5e5;
