@@ -1,7 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700&subset=latin,latin-ext);
 @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono&subset=latin,latin-ext);
-
-html, body {
+html,
+body {
 	height: 100%;
 }
 body {
@@ -37,20 +37,19 @@ body {
 	}
 }
 /* Responsive: Portrait tablets and up */
-
+}
+/* Make the masthead heading the same height as the navigation */
 @media screen and (min-width: 768px) {
 	/* Remove the padding we set earlier */
 	.header {
 		padding-right: 0;
 		padding-left: 0;
 	}
-	/* Space out the masthead */
 	.header {
 		margin-bottom: 5px;
 		padding-top: 20px;
 	}
 }
-/* Make the masthead heading the same height as the navigation */
 
 .header h3 {
 	padding-bottom: 19px;
@@ -60,6 +59,7 @@ body {
 	top: 0
 }
 /*Sticky Footer*/
+
 .datfooter {
 	height: 90px;
 	background-color: #002a5c;
@@ -68,6 +68,8 @@ body {
 	vertical-align: middle;
 	text-overflow: clip;
 	display: block;
+	background-image: url('/images/rstripes.png');
+	background-position: fixed;
 }
 .container {
 	min-height: 100%;
@@ -78,8 +80,6 @@ body {
 	display: block;
 	height: 80px;
 }
-
-
 /* Links */
 
 a,
@@ -121,21 +121,8 @@ body {
 	vertical-align: middle;
 }
 @media (min-width: 992px) {
-	.container,
-	.masthead,
-	.cover-container {
+	.container {
 		width: 800px
-	}
-	.fixed {
-		position: fixed;
-		z-index: 999;
-		max-width: 800px;
-		min-width: 770px;
-		background-image: url('/images/Background.png');
-		background-color: #002a5c;
-		background-repeat: no-repeat;
-		background-attachment: fixed;
-		background-position: center;
 	}
 	.header {
 		border-bottom: 1px solid #e5e5e5;
