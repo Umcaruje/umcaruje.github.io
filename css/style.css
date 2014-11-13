@@ -60,7 +60,7 @@ body {
 
 .datfooter {
 	height: 90px;
-	background-color: #002a5c;
+	background-color: transparent;
 	padding: 30px;
 	margin: 0 auto;
 	vertical-align: middle;
@@ -71,7 +71,7 @@ body {
 }
 .container {
 	min-height: 100%;
-	margin-bottom: -80px;
+	margin-bottom: -70px;
 }
 .container:after {
 	content: "";
@@ -134,9 +134,13 @@ body {
 	text-align: left;
 }
 .nolinks,
-.nolinks a:link,
+.nolinks a,
 .nolinks a:visited {
 	color: #e6e6e6;
+}
+.nolinks a:hover {
+	color: #c0eafc;
+	text-decoration: none;
 }
 .rightest-text {
 	text-align: right;
