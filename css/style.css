@@ -60,14 +60,15 @@ body {
 
 .datfooter {
 	height: 90px;
-	background-color: transparent;
 	padding: 30px;
+	background-color: transparent;
 	margin: 0 auto;
 	vertical-align: middle;
 	text-overflow: clip;
 	display: block;
-	background-image: url('/images/rstripes.png');
+	background-image: url('/images/stripes.png');
 	background-position: fixed;
+	opacity: 50%;
 }
 .container {
 	min-height: 100%;
