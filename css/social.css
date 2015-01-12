@@ -23,31 +23,17 @@
 	overflow: hidden;
 	line-height: normal;
 	border-radius: 1px;
-	margin: 2px; line-height,
-	transition-property: height, width, font-size, margin;
-	transition-duration: 0.2s;
-	transition-timing-function: linear;
-	/* Cross browser*/
-	-webkit-transition-property: height, width, font-size, line-height, margin;
-	-webkit-transition-duration: 0.2s;
-	-webkittransition-timing-function: linear;
+	margin: 2px;
+	transform: translateY(0px);
+	transition: all 0.1s ease-in-out 0.2s;
 }
 /* Grow on hover */
 
 .sbtn:hover {
+	border-radius: 4px;
 	color: #fff;
-	width: 42px;
-	height: 42px;
-	margin: 1px;
-	font-size: 32px;
-	line-height: normal;
-	transition-property: height, width, font-size, margin;
-	transition-duration: 0.2s;
-	transition-timing-function: linear;
-	/* Cross browser*/
-	-webkit-transition-property: height, width, font-size, line-height, margin;
-	-webkit-transition-duration: 0.2s;
-	-webkit-transition-timing-function: linear;
+	transform: translateY(-4px);
+	transition: all 0.1s ease-in-out 0s;
 }
 /* Colors for the buttons*/
 
