@@ -34,6 +34,8 @@
 .credits summary {cursor:pointer;list-style:none;}
 .credits p {background:#080808;padding:12px;border:1px solid #222;}
 .credits a {font:inherit;letter-spacing:0;padding:0;color:#999;}
+.controls-hint {position:absolute;z-index:1;left:24px;top:22px;margin:0;color:#777;font:10px/1.7 "Courier New",monospace;pointer-events:none;letter-spacing:.03em;}
+@media(max-width:600px){.controls-hint{max-width:210px;left:20px;font-size:9px;}}
 </style>
 </head>
 <body>
@@ -41,6 +43,7 @@
   <canvas aria-label="Anatomical brain with glowing white contours rotating 360 degrees" role="img"></canvas>
 <p class="status" role="status">LOADING BRAIN</p>
 <details class="credits"><summary aria-label="3D model credits">© 3D</summary><p>Model: Z-Anatomy / BodyParts3D © DBCLS, via <a href="https://github.com/itayinbarr/brainproject">Brain Project</a>.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Anatomical surfaces converted to monochrome 3D contour lines.</p></details>
+  <p class="controls-hint">DRAG TO ROTATE · SCROLL TO ZOOM<br>SHIFT + DRAG TO ROLL · DOUBLE-CLICK TO RESET</p>
   <div class="identity"><h1>umcaruje</h1></div>
   <button type="button" hidden>PAUSE</button>
 </main>
@@ -51,17 +54,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 const canvas=document.querySelector('canvas'), button=document.querySelector('button'), status=document.querySelector('.status');
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
-let paused=motion.matches, loaded=false, time=0, last=0, dragging=false, lastX=0;
+let paused=motion.matches, loaded=false, time=0, last=0, dragging=false, lastX=0, lastY=0, zoom=1;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
 renderer.setClearColor(0x000000);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
 const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(36,1,.1,50);
 camera.position.set(0,.25,7.5);camera.lookAt(0,0,0);
-const root=new THREE.Group();root.rotation.set(.08,-Math.PI/2,0);scene.add(root);
+const root=new THREE.Group();root.rotation.set(.08,-Math.PI/2,0);const interaction=new THREE.Group();scene.add(interaction);interaction.add(root);
 const uniforms={uTime:{value:0}};
 // Render actual 3D line segments: no surface mesh or depth-only shell.
 const material=new THREE.ShaderMaterial({
- uniforms, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+ uniforms, transparent:true, depthWrite:false, blending:THREE.NormalBlending,
  vertexShader:`
  attribute vec3 surfaceNormal;
  varying float vFacing; varying vec3 vPosition;
@@ -78,7 +81,7 @@ const material=new THREE.ShaderMaterial({
   float front=smoothstep(-.15,.65,vFacing);
   float wave=sin(vPosition.y*5.+vPosition.x*2.-uTime*1.7);
   float pulse=pow(max(0.,wave),12.);
-  float brightness=mix(.025,.42,front)+pulse*mix(.015,.24,front);
+  float brightness=mix(.018,.64,front)+pulse*mix(.008,.18,front);
   gl_FragColor=vec4(vec3(1.),brightness);
  }`
 });
@@ -107,7 +110,7 @@ function traceContours(geometry){
   curvature[i]=weight?sum/weight:0;
  }
  // Suppress triangulation noise, keeping broad ridges and sulci.
- for(let pass=0;pass<3;pass++){
+ for(let pass=0;pass<5;pass++){
   const smoothed=new Float32Array(vertexCount);
   for(let i=0;i<vertexCount;i++){
    let sum=0;for(const j of neighbors[i])sum+=curvature[j];
@@ -118,7 +121,7 @@ function traceContours(geometry){
  const positions=[],normals=[];
  // A few nested contours wrap each actual ridge instead of filling a grid.
  for(const tri of ids){
-  for(const level of [-2.0,.8,3.2]){
+  for(const level of [-1.5,2.5]){
    const hits=[];
    for(let edge=0;edge<3;edge++){
     const i=tri[edge],j=tri[(edge+1)%3],a=curvature[i],b=curvature[j];
@@ -133,9 +136,48 @@ function traceContours(geometry){
    if(hits.length===2)for(const hit of hits){positions.push(...hit.p);normals.push(...hit.n);}
   }
  }
+
+ // Join contours, remove tiny noisy islands, and soften triangulation corners.
+ const vertices=[],edges=[],keys=new Map();
+ function point(offset){
+  const xyz=positions.slice(offset,offset+3),key=xyz.map(v=>Math.round(v*100000)).join(',');
+  if(keys.has(key))return keys.get(key);
+  const id=vertices.length;keys.set(key,id);
+  vertices.push({p:xyz,n:normals.slice(offset,offset+3),neighbors:new Set()});return id;
+ }
+ for(let i=0;i<positions.length;i+=6){
+  const a=point(i),b=point(i+3);if(a===b||vertices[a].neighbors.has(b))continue;
+  vertices[a].neighbors.add(b);vertices[b].neighbors.add(a);edges.push([a,b]);
+ }
+ const keep=new Set(),visited=new Set();
+ for(let seed=0;seed<vertices.length;seed++){
+  if(visited.has(seed))continue;
+  const component=[],queue=[seed];visited.add(seed);let length=0;
+  for(let q=0;q<queue.length;q++){
+   const i=queue[q];component.push(i);
+   for(const j of vertices[i].neighbors){
+    if(i<j)length+=Math.hypot(...vertices[i].p.map((v,k)=>v-vertices[j].p[k]));
+    if(!visited.has(j)){visited.add(j);queue.push(j);}
+   }
+  }
+  if(length>.085)for(const i of component)keep.add(i);
+ }
+ for(let pass=0;pass<2;pass++){
+  const next=vertices.map(v=>{
+   if(v.neighbors.size!==2)return v.p;
+   const [a,b]=[...v.neighbors];
+   return v.p.map((p,k)=>p*.65+(vertices[a].p[k]+vertices[b].p[k])*.175);
+  });
+  vertices.forEach((v,i)=>{v.p=next[i];});
+ }
+ const cleanPositions=[],cleanNormals=[];
+ for(const [a,b] of edges){
+  if(!keep.has(a))continue;
+  for(const i of [a,b]){cleanPositions.push(...vertices[i].p);cleanNormals.push(...vertices[i].n);}
+ }
  const lines=new THREE.BufferGeometry();
- lines.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
- lines.setAttribute('surfaceNormal',new THREE.Float32BufferAttribute(normals,3));
+ lines.setAttribute('position',new THREE.Float32BufferAttribute(cleanPositions,3));
+ lines.setAttribute('surfaceNormal',new THREE.Float32BufferAttribute(cleanNormals,3));
  return lines;
 }
 const decoder=new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
@@ -189,14 +231,38 @@ function render(){
 function resize(){
  const w=canvas.clientWidth,h=canvas.clientHeight;
  renderer.setSize(w,h,false);camera.aspect=w/h;
- camera.position.z=camera.aspect<.8?10:7.5;camera.updateProjectionMatrix();render();
+ camera.position.z=(camera.aspect<.8?10:7.5)*zoom;camera.updateProjectionMatrix();render();
 }
 function syncButton(){button.textContent=paused?'PLAY':'PAUSE';button.setAttribute('aria-label',paused?'Play brain rotation':'Pause brain rotation');}
 button.addEventListener('click',()=>{paused=!paused;syncButton();});
 motion.addEventListener('change',()=>{paused=motion.matches;syncButton();});
-canvas.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;dragging=true;lastX=e.clientX;canvas.setPointerCapture(e.pointerId);});
-canvas.addEventListener('pointermove',e=>{if(!dragging)return;root.rotation.y+=(e.clientX-lastX)*.008;lastX=e.clientX;render();});
+const turnQuaternion=new THREE.Quaternion();
+const screenX=new THREE.Vector3(1,0,0),screenY=new THREE.Vector3(0,1,0),screenZ=new THREE.Vector3(0,0,1);
+canvas.addEventListener('pointerdown',e=>{
+ if(!e.isPrimary||e.button!==0)return;
+ dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+ if(!dragging||!e.isPrimary)return;
+ const dx=e.clientX-lastX,dy=e.clientY-lastY;
+ if(e.shiftKey){
+  interaction.quaternion.premultiply(turnQuaternion.setFromAxisAngle(screenZ,-dx*.008));
+ }else{
+  interaction.quaternion.premultiply(turnQuaternion.setFromAxisAngle(screenY,dx*.008));
+  interaction.quaternion.premultiply(turnQuaternion.setFromAxisAngle(screenX,dy*.008));
+ }
+ interaction.quaternion.normalize();lastX=e.clientX;lastY=e.clientY;render();
+});
+canvas.addEventListener('pointerup',e=>{dragging=false;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);});
 canvas.addEventListener('lostpointercapture',()=>{dragging=false;});
+canvas.addEventListener('pointercancel',()=>{dragging=false;});
+canvas.addEventListener('wheel',e=>{
+ e.preventDefault();
+ const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?canvas.clientHeight:1);
+ zoom=THREE.MathUtils.clamp(zoom*Math.exp(THREE.MathUtils.clamp(delta,-150,150)*.0015),.42,2);
+ camera.position.z=(camera.aspect<.8?10:7.5)*zoom;render();
+},{passive:false});
+canvas.addEventListener('dblclick',()=>{interaction.quaternion.identity();zoom=1;resize();});
 document.addEventListener('visibilitychange',()=>{last=0;});
 new ResizeObserver(resize).observe(canvas);
 renderer.setAnimationLoop(now=>{
@@ -204,10 +270,10 @@ renderer.setAnimationLoop(now=>{
  if(document.hidden||!loaded)return;
  if(!paused){
   time+=dt;
-  if(!dragging)root.rotation.y+=dt*.20;
+  if(!dragging){root.rotation.y+=dt*.20;
   root.rotation.x=.08+Math.sin(time*.43)*.23;
   root.rotation.z=Math.sin(time*.31)*.10;
-  root.position.y=Math.sin(time*.67)*.045;
+  root.position.y=Math.sin(time*.67)*.045;}
   render();
  }
 });
