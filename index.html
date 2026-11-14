@@ -8,34 +8,29 @@
 <title>umcaruje</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #000; color: #fafafa; font-family: Geist, Arial, sans-serif; }
   main { min-height: 100svh; display: grid; position: relative; isolation: isolate; overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
-  .identity { align-self: end; justify-self: start; z-index: 1; margin: clamp(22px, 4.1vw, 68px); pointer-events: none; }
-  h1 { font-family: "Space Grotesk", sans-serif; font-size: clamp(38px, 6vw, 96px); line-height: .95; letter-spacing: -.075em; margin: 0; font-weight: 700; }
+  .identity { position: absolute; bottom: clamp(22px, 4.1vw, 68px); left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none; }
+  h1 { font-family: "Space Grotesk", sans-serif; font-size: clamp(12.67px, 2vw, 32px); line-height: .95; letter-spacing: -.04em; margin: 0; font-weight: 300; color: rgba(210,210,210,.28); }
   h1 span { color: #777; }
   nav { position: absolute; z-index: 1; top: max(24px, env(safe-area-inset-top)); right: max(24px, env(safe-area-inset-right)); }
   a, button { font: 11px/1.2 "Courier New", monospace; letter-spacing: .09em; color: #a8a8a8; }
   a { display: inline-block; padding: 10px; text-decoration: none; }
   a:hover, button:hover { color: #fff; }
   a:focus-visible, button:focus-visible { outline: 1px solid #fff; outline-offset: 3px; }
-  button[hidden] { display: none; }
-  button { position: absolute; z-index: 1; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); background: #000; border: 1px solid #363636; padding: 10px 12px; cursor: pointer; }
   canvas:active { cursor: grabbing; }
   @media (max-width: 480px) {
     nav { top: max(15px, env(safe-area-inset-top)); right: 12px; }
-    button { right: 16px; bottom: max(20px, env(safe-area-inset-bottom)); }
   }
 .status { position:absolute;top:45%;left:0;right:0;text-align:center;font:11px monospace;letter-spacing:.15em;color:#999;pointer-events:none; }
 .credits {position:absolute;top:22px;right:24px;z-index:2;font:10px/1.6 monospace;color:#666;max-width:260px;text-align:right;}
 .credits summary {cursor:pointer;list-style:none;}
 .credits p {background:#080808;padding:12px;border:1px solid #222;}
 .credits a {font:inherit;letter-spacing:0;padding:0;color:#999;}
-.controls-hint {position:absolute;z-index:1;left:24px;top:22px;margin:0;color:#777;font:10px/1.7 "Courier New",monospace;pointer-events:none;letter-spacing:.03em;}
-@media(max-width:600px){.controls-hint{max-width:210px;left:20px;font-size:9px;}}
 </style>
 </head>
 <body>
@@ -43,16 +38,14 @@
   <canvas aria-label="Anatomical brain with glowing white contours rotating 360 degrees" role="img"></canvas>
 <p class="status" role="status">LOADING BRAIN</p>
 <details class="credits"><summary aria-label="3D model credits">© 3D</summary><p>Model: Z-Anatomy / BodyParts3D © DBCLS, via <a href="https://github.com/itayinbarr/brainproject">Brain Project</a>.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Anatomical surfaces converted to monochrome 3D contour lines.</p></details>
-  <p class="controls-hint">DRAG TO ROTATE · SCROLL TO ZOOM<br>SHIFT + DRAG TO ROLL · DOUBLE-CLICK TO RESET</p>
   <div class="identity"><h1>umcaruje</h1></div>
-  <button type="button" hidden>PAUSE</button>
 </main>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-const canvas=document.querySelector('canvas'), button=document.querySelector('button'), status=document.querySelector('.status');
+const canvas=document.querySelector('canvas'), status=document.querySelector('.status');
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
 let paused=motion.matches, loaded=false, time=0, last=0, dragging=false, lastX=0, lastY=0, zoom=1;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
@@ -218,24 +211,10 @@ async function start(){
   root.add(new THREE.LineSegments(lines,material));
   geometry.dispose();
  }
- loaded=true;status.hidden=true;button.hidden=false;syncButton();render();decoder.dispose();
+ loaded=true;status.hidden=true;render();decoder.dispose();
 }
-const particleCount=150,positions=new Float32Array(particleCount*3),seeds=[];
-for(let i=0;i<particleCount;i++){
- const y=1-2*(i+.5)/particleCount,a=i*2.399963;
- seeds.push(new THREE.Vector3(Math.sqrt(1-y*y)*Math.cos(a),y,Math.sqrt(1-y*y)*Math.sin(a)));
-}
-const particleGeometry=new THREE.BufferGeometry();
-particleGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
-const particles=new THREE.Points(particleGeometry,new THREE.PointsMaterial({color:0xffffff,size:.009,transparent:true,opacity:.45,depthWrite:false}));
-scene.add(particles);
 function render(){
  uniforms.uTime.value=time;
- for(let i=0;i<particleCount;i++){
-  const p=seeds[i],r=1.55+((time*.10+i*.618)%1)*.65;
-  positions[i*3]=p.x*r;positions[i*3+1]=p.y*r*.85;positions[i*3+2]=p.z*r;
- }
- particleGeometry.attributes.position.needsUpdate=true;
  renderer.render(scene,camera);
 }
 function resize(){
@@ -243,9 +222,7 @@ function resize(){
  renderer.setSize(w,h,false);camera.aspect=w/h;
  camera.position.z=(camera.aspect<.8?10:7.5)*zoom;camera.updateProjectionMatrix();render();
 }
-function syncButton(){button.textContent=paused?'PLAY':'PAUSE';button.setAttribute('aria-label',paused?'Play brain rotation':'Pause brain rotation');}
-button.addEventListener('click',()=>{paused=!paused;syncButton();});
-motion.addEventListener('change',()=>{paused=motion.matches;syncButton();});
+motion.addEventListener('change',()=>{paused=motion.matches;render();});
 const turnQuaternion=new THREE.Quaternion();
 const screenX=new THREE.Vector3(1,0,0),screenY=new THREE.Vector3(0,1,0),screenZ=new THREE.Vector3(0,0,1);
 canvas.addEventListener('pointerdown',e=>{
