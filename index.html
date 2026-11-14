@@ -6,13 +6,16 @@
 <meta name="theme-color" content="#000000">
 <meta name="description" content="umcaruje">
 <title>umcaruje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #000; color: #fafafa; font-family: Geist, Arial, sans-serif; }
   main { min-height: 100svh; display: grid; position: relative; isolation: isolate; overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
   .identity { align-self: end; justify-self: start; z-index: 1; margin: clamp(22px, 4.1vw, 68px); pointer-events: none; }
-  h1 { font-size: clamp(42px, 7.2vw, 122px); line-height: .86; letter-spacing: -.085em; margin: 0; font-weight: 700; }
+  h1 { font-family: "Space Grotesk", sans-serif; font-size: clamp(38px, 6vw, 96px); line-height: .95; letter-spacing: -.075em; margin: 0; font-weight: 700; }
   h1 span { color: #777; }
   nav { position: absolute; z-index: 1; top: max(24px, env(safe-area-inset-top)); right: max(24px, env(safe-area-inset-right)); }
   a, button { font: 11px/1.2 "Courier New", monospace; letter-spacing: .09em; color: #a8a8a8; }
@@ -31,8 +34,7 @@
 <body>
 <main>
   <canvas aria-hidden="true"></canvas>
-  <nav aria-label="Projects"><a href="./imposter.html">IMPOSTER ↗</a></nav>
-  <div class="identity"><h1>umcaruje<span>.</span></h1></div>
+  <div class="identity"><h1>umcaruje</h1></div>
   <button type="button" hidden>PAUSE</button>
 </main>
 <script>
@@ -47,61 +49,54 @@
     "rgba(255,255,255,.34)", "rgba(255,255,255,.57)", "rgba(255,255,255,.85)"
   ];
 
-  // Each hemisphere has its own folded contour with a gap along the midline.
+  // Two distinct cerebral hemispheres, separated by the longitudinal fissure.
+  // A broad crown and tapered lower lobes keep the silhouette anatomical.
   function surface(side, latitude, theta) {
-    const y = sin(latitude);
-    const radius = cos(latitude);
-    const phase = side === 1 ? 0.82 : 0;
-    const fold = 6.6 * theta + 5.1 * latitude + 1.7 * sin(3 * latitude - 2 * theta + phase);
-    const fine = 11 * latitude - 5 * theta + 1.4 * cos(5 * theta + phase);
-    const crease = Math.pow(.5 + .5 * cos(fold + .38 * sin(fine)), 5);
-    const volume = 1 + .052 * sin(5 * theta - 8 * latitude + phase) - .126 * crease;
+    const y = sin(latitude), r = cos(latitude);
+    const front = sin(theta);
+    const fold = .028 * sin(theta * 15 + latitude * 13)
+      + .018 * sin(theta * 25 - latitude * 9);
+    const lobe = 1 + .10 * y - .13 * max(0, -y);
     return [
-      side * (.037 + .028 * y * y + .84 * radius * sin(theta) * volume * (1 + .09 * y)),
-      .98 * y + .066 * radius * sin(3 * theta + 6 * latitude + phase),
-      .58 * radius * cos(theta) * volume + .06 * y
+      side * (.055 + .79 * r * front * lobe + fold * r * front),
+      .80 * y + .035 * r * sin(theta * 3) - .035 * front,
+      .69 * r * cos(theta) * (1 + fold) + .05 * y
     ];
   }
 
   function addCurve(side, sample, weight, seed) {
     const points = [];
-    for (let step = 0; step <= 52; step++) points.push(surface(side, ...sample(step / 52)));
+    for (let step = 0; step <= 100; step++) points.push(surface(side, ...sample(step / 100)));
     curves.push({ points, weight, seed, projected: new Float32Array(points.length * 3) });
   }
 
   for (const side of [-1, 1]) {
-    for (let row = 0; row < 32; row++) {
-      const base = -1.42 + row * 2.84 / 31;
-      const band = row % 4 === 0;
-      addCurve(side, u => {
-        const a = u * PI;
-        const wave = .088 * sin(4 * a + base * 6 + side * .4) + .041 * sin(9 * a - base * 11);
-        return [base + sin(a) * wave * cos(base), a];
-      }, band ? 1 : 0, row * .113 + side * .32);
-    }
-    // Local looping folds give the surface its irregular gyri.
-    for (let row = 0; row < 6; row++) {
-      for (let column = 0; column < 5; column++) {
-        const seed = row * 5 + column + side * 37;
-        const latitude = -.99 + row * .39 + .075 * sin(seed * 3.17);
-        const theta = .26 + column * .65 + .115 * sin(seed * 1.91);
-        for (let fold = 0; fold < 2; fold++) {
-          addCurve(side, u => {
-            const angle = u * PI * 2;
-            const ripple = 1 + .21 * sin(3 * angle + seed) + .16 * cos(2 * angle - seed);
-            const radius = ripple * (1 - fold * .22);
-            return [latitude + radius * (.16 * sin(angle) + .045 * cos(angle)),
-              theta + radius * (.27 * cos(angle) + .095 * sin(angle))];
-          }, 1, seed * .093 + fold * .13);
-        }
+    // Interlocking, winding gyri instead of circular loops or a globe grid.
+    for (let row = 0; row < 19; row++) {
+      const base = -1.38 + row * 2.76 / 18;
+      for (let edge = 0; edge < 2; edge++) {
+        addCurve(side, u => {
+          const a = u * PI;
+          const winding = .082 * sin(7 * a + row * .91)
+            + .035 * sin(15 * a - row * .62)
+            + .018 * sin(23 * a + row);
+          return [base + cos(base) * sin(a) * winding + edge * .026, a];
+        }, row % 3 === 0 ? 1 : .5, row * .17 + edge * .024 + side * .31);
       }
     }
-    for (let column = 0; column <= 14; column++) {
-      const base = column * PI / 14;
-      addCurve(side, u => {
-        const a = -1.47 + u * 2.94;
-        return [a, base + sin(base) * (.10 * sin(a * 7 + base * 4) + .045 * cos(a * 15 - base * 5))];
-      }, column % 7 === 0 ? 1 : 0, column * .173 + side * .19);
+    // Strong medial outline makes the split between hemispheres unmistakable.
+    for (const theta of [0, .065, PI - .065, PI]) {
+      addCurve(side, u => [-PI / 2 + u * PI, theta], 1, theta + side);
+    }
+    // Short crossing sulci break the regular bands into organic regions.
+    for (let column = 1; column < 8; column++) {
+      const a = column * PI / 8;
+      for (let part = 0; part < 3; part++) {
+        addCurve(side, u => {
+          const lat = -1.18 + part * .79 + u * .56;
+          return [lat, a + .06 * sin(lat * 13 + column)];
+        }, .5, column * .21 + part);
+      }
     }
   }
 
@@ -124,8 +119,33 @@
       context.fillRect(Math.round(x * width), Math.round(y * height), 1, 1);
     }
 
-    const turn = .28 + .46 * sin(seconds * .44) + yaw;
-    const tilt = -.12 + .11 * cos(seconds * .37) + pitch;
+    // A slow, monochrome corona radiates out from the brain.
+    const halo = context.createRadialGradient(centerX, centerY, scale * .45, centerX, centerY, scale * 1.7);
+    halo.addColorStop(0, "rgba(255,255,255,0)");
+    halo.addColorStop(.35, "rgba(255,255,255,.035)");
+    halo.addColorStop(1, "rgba(255,255,255,0)");
+    context.fillStyle = halo;
+    context.fillRect(0, 0, width, height);
+    for (let ray = 0; ray < 92; ray++) {
+      const angle = ray * PI * 2 / 92 + .018 * sin(seconds * .3 + ray);
+      const wave = .5 + .5 * sin(seconds * 1.4 - ray * .71);
+      const inner = scale * (1.04 + .09 * sin(ray * 7.3));
+      const outer = inner + scale * (.05 + .22 * Math.pow(wave, 3));
+      context.beginPath();
+      context.moveTo(centerX + cos(angle) * inner, centerY + sin(angle) * inner * .88);
+      context.lineTo(centerX + cos(angle) * outer, centerY + sin(angle) * outer * .88);
+      context.strokeStyle = "rgba(255,255,255," + (.035 + .23 * wave) + ")";
+      context.lineWidth = ray % 7 === 0 ? 1.1 : .55;
+      context.stroke();
+      if (ray % 4 === 0) {
+        const travel = (seconds * .12 + ray * .618) % 1;
+        const radius = scale * (1.04 + travel * .65);
+        context.fillStyle = "rgba(255,255,255," + ((1 - travel) * .5) + ")";
+        context.fillRect(centerX + cos(angle) * radius, centerY + sin(angle) * radius * .88, 1.2, 1.2);
+      }
+    }
+    const turn = .12 + .32 * sin(seconds * .28) + yaw;
+    const tilt = -.38 + .08 * cos(seconds * .31) + pitch;
     const ct = cos(turn), st = sin(turn), cp = cos(tilt), sp = sin(tilt);
     const pulse = 1 + .012 * sin(seconds * 2.4);
     const scanCenter = centerY + sin(seconds * .83) * .75 * scale;
@@ -151,7 +171,7 @@
         const scanDistance = screen[i + 1] - scanCenter;
         const scan = exp(-scanDistance * scanDistance * scanFalloff);
         const signal = sin(i * .030 - seconds * 3.1 + curve.seed * 12);
-        const level = max(0, min(5, Math.floor(1.42 + depth * 4.65 + curve.weight * .86 + scan * 1.35 + max(0, signal) * .56)));
+        const level = max(0, min(5, Math.floor(1.42 + depth * 4.65 + curve.weight * 1.1 + scan * 1.8 + max(0, signal) * .56)));
         bins[level].moveTo(screen[i - 3], screen[i - 2]);
         bins[level].lineTo(screen[i], screen[i + 1]);
         if (curve.weight && depth > .32 && i % 15 === 0 && signal > .985) {
@@ -166,7 +186,7 @@
       context.lineWidth = i > 3 ? 1.05 : .7;
       context.stroke(bins[i]);
     }
-    context.shadowBlur = 8;
+    context.shadowBlur = 16;
     context.shadowColor = "#fff";
     context.strokeStyle = "rgba(255,255,255,.39)";
     context.stroke(bins[5]);
@@ -181,9 +201,9 @@
     canvas.width = Math.round(width * pixelRatio);
     canvas.height = Math.round(height * pixelRatio);
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    centerX = width * (width > 800 ? .54 : .5);
+    centerX = width * .5;
     centerY = height * .455;
-    scale = min(height * .345, width * .465);
+    scale = min(height * .29, width * .34);
     draw();
   }
 
