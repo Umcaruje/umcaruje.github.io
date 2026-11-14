@@ -40,7 +40,7 @@
 <main>
   <canvas aria-label="Anatomical brain with glowing white contours rotating 360 degrees" role="img"></canvas>
 <p class="status" role="status">LOADING BRAIN</p>
-<details class="credits"><summary aria-label="3D model credits">© 3D</summary><p>Model: Z-Anatomy / BodyParts3D © DBCLS, via <a href="https://github.com/itayinbarr/brainproject">Brain Project</a>.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Selected surfaces, rescaled and rendered in monochrome.</p></details>
+<details class="credits"><summary aria-label="3D model credits">© 3D</summary><p>Model: Z-Anatomy / BodyParts3D © DBCLS, via <a href="https://github.com/itayinbarr/brainproject">Brain Project</a>.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Anatomical surfaces converted to monochrome 3D contour lines.</p></details>
   <div class="identity"><h1>umcaruje</h1></div>
   <button type="button" hidden>PAUSE</button>
 </main>
@@ -59,31 +59,63 @@ const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(36,1,.1,50);
 camera.position.set(0,.25,7.5);camera.lookAt(0,0,0);
 const root=new THREE.Group();root.rotation.set(.08,-Math.PI/2,0);scene.add(root);
 const uniforms={uTime:{value:0}};
+// Render actual 3D line segments: no surface mesh or depth-only shell.
 const material=new THREE.ShaderMaterial({
-uniforms,
-vertexShader:`
-varying vec3 vNormal; varying vec3 vView; varying vec3 vPosition;
-void main(){
- vPosition=position;
- vec4 view=modelViewMatrix*vec4(position,1.);
- vNormal=normalize(normalMatrix*normal);vView=-view.xyz;
- gl_Position=projectionMatrix*view;
-}`,
-fragmentShader:`
-uniform float uTime;
-varying vec3 vNormal; varying vec3 vView; varying vec3 vPosition;
-void main(){
- vec3 n=normalize(vNormal),v=normalize(vView);
- float rim=pow(1.-abs(dot(n,v)),3.2);
- float light=max(0.,dot(n,normalize(vec3(-.4,.7,1.))));
- float bands=abs(sin(vPosition.y*90.+vPosition.x*3.));
- float line=1.-smoothstep(.06,.18,bands);
- float sweep=exp(-pow((vPosition.y-sin(uTime*.65)*1.5)*7.,2.));
- float shade=.028+pow(light,2.)*.16;
- float ink=shade+rim*.62+line*(.12+light*.25)+sweep*(line*.6+rim*.3);
- gl_FragColor=vec4(vec3(ink),1.);
-}`
+ uniforms, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+ vertexShader:`
+ attribute vec3 surfaceNormal;
+ varying float vFacing; varying vec3 vPosition;
+ void main(){
+  vPosition=position;
+  vec4 view=modelViewMatrix*vec4(position,1.);
+  vFacing=dot(normalize(normalMatrix*surfaceNormal),normalize(-view.xyz));
+  gl_Position=projectionMatrix*view;
+ }`,
+ fragmentShader:`
+ uniform float uTime;
+ varying float vFacing; varying vec3 vPosition;
+ void main(){
+  float front=smoothstep(-.15,.65,vFacing);
+  float wave=sin(vPosition.y*5.+vPosition.x*2.-uTime*1.7);
+  float pulse=pow(max(0.,wave),12.);
+  float brightness=mix(.055,.48,front)+pulse*mix(.025,.28,front);
+  gl_FragColor=vec4(vec3(1.),brightness);
+ }`
 });
+// Intersect anatomy triangles with gently warped contour planes.
+// The result is a hollow collection of lines, not stripes drawn on a solid.
+function traceContours(geometry){
+ const p=geometry.attributes.position,n=geometry.attributes.normal,index=geometry.index;
+ const positions=[],normals=[],step=.045;
+ const count=index?index.count:p.count;
+ const vertex=k=>{
+  const i=index?index.getX(k):k;
+  const x=p.getX(i),y=p.getY(i),z=p.getZ(i);
+  return {p:[x,y,z],n:[n.getX(i),n.getY(i),n.getZ(i)],
+   level:y+.07*Math.sin(x*5.+z*2.)+.035*Math.sin(z*7.-x*3.)};
+ };
+ for(let t=0;t<count;t+=3){
+  const tri=[vertex(t),vertex(t+1),vertex(t+2)];
+  const lo=Math.min(...tri.map(v=>v.level)),hi=Math.max(...tri.map(v=>v.level));
+  for(let plane=Math.ceil(lo/step)*step;plane<hi;plane+=step){
+   const hits=[];
+   for(let edge=0;edge<3;edge++){
+    const a=tri[edge],b=tri[(edge+1)%3];
+    if((a.level<=plane&&b.level>plane)||(b.level<=plane&&a.level>plane)){
+     const f=(plane-a.level)/(b.level-a.level);
+     hits.push({p:a.p.map((v,j)=>v+(b.p[j]-v)*f),n:a.n.map((v,j)=>v+(b.n[j]-v)*f)});
+    }
+   }
+   if(hits.length===2){
+    for(const hit of hits){positions.push(...hit.p);normals.push(...hit.n);}
+   }
+  }
+ }
+ const lines=new THREE.BufferGeometry();
+ lines.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+ lines.setAttribute('surfaceNormal',new THREE.Float32BufferAttribute(normals,3));
+ return lines;
+}
 const decoder=new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/');
 const loader=new GLTFLoader().setDRACOLoader(decoder);
 const modelPath='itayinbarr/brainproject@2929e94f521a8ddceab26bc100a98dc06b0da060/brain-atlas/models/brain.glb';
@@ -108,7 +140,9 @@ async function start(){
  for(const geometry of meshes){
   geometry.translate(-center.x,-center.y,-center.z);geometry.scale(scale,scale,scale);
   if(!geometry.attributes.normal)geometry.computeVertexNormals();
-  root.add(new THREE.Mesh(geometry,material));
+  const lines=traceContours(geometry);
+  root.add(new THREE.LineSegments(lines,material));
+  geometry.dispose();
  }
  loaded=true;status.hidden=true;button.hidden=false;syncButton();render();decoder.dispose();
 }
@@ -146,7 +180,14 @@ new ResizeObserver(resize).observe(canvas);
 renderer.setAnimationLoop(now=>{
  const dt=last?Math.min((now-last)/1000,.04):0;last=now;
  if(document.hidden||!loaded)return;
- if(!paused){time+=dt;if(!dragging)root.rotation.y+=dt*.20;render();}
+ if(!paused){
+  time+=dt;
+  if(!dragging)root.rotation.y+=dt*.20;
+  root.rotation.x=.08+Math.sin(time*.43)*.23;
+  root.rotation.z=Math.sin(time*.31)*.10;
+  root.position.y=Math.sin(time*.67)*.045;
+  render();
+ }
 });
 resize();
 start().catch(error=>{console.error(error);status.textContent='Brain could not load. Refresh to retry.';});
