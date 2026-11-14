@@ -55,17 +55,17 @@
     const fold = 6.6 * theta + 5.1 * latitude + 1.7 * sin(3 * latitude - 2 * theta + phase);
     const fine = 11 * latitude - 5 * theta + 1.4 * cos(5 * theta + phase);
     const crease = Math.pow(.5 + .5 * cos(fold + .38 * sin(fine)), 5);
-    const volume = 1 + .032 * sin(5 * theta - 8 * latitude + phase) - .095 * crease;
+    const volume = 1 + .052 * sin(5 * theta - 8 * latitude + phase) - .126 * crease;
     return [
-      side * (.037 + .028 * y * y + .72 * radius * sin(theta) * volume * (1 + .09 * y)),
-      1.01 * y + .056 * radius * sin(3 * theta + 6 * latitude + phase),
+      side * (.037 + .028 * y * y + .84 * radius * sin(theta) * volume * (1 + .09 * y)),
+      .98 * y + .066 * radius * sin(3 * theta + 6 * latitude + phase),
       .58 * radius * cos(theta) * volume + .06 * y
     ];
   }
 
   function addCurve(side, sample, weight, seed) {
     const points = [];
-    for (let step = 0; step <= 96; step++) points.push(surface(side, ...sample(step / 96)));
+    for (let step = 0; step <= 52; step++) points.push(surface(side, ...sample(step / 52)));
     curves.push({ points, weight, seed, projected: new Float32Array(points.length * 3) });
   }
 
@@ -78,6 +78,23 @@
         const wave = .088 * sin(4 * a + base * 6 + side * .4) + .041 * sin(9 * a - base * 11);
         return [base + sin(a) * wave * cos(base), a];
       }, band ? 1 : 0, row * .113 + side * .32);
+    }
+    // Local looping folds give the surface its irregular gyri.
+    for (let row = 0; row < 6; row++) {
+      for (let column = 0; column < 5; column++) {
+        const seed = row * 5 + column + side * 37;
+        const latitude = -.99 + row * .39 + .075 * sin(seed * 3.17);
+        const theta = .26 + column * .65 + .115 * sin(seed * 1.91);
+        for (let fold = 0; fold < 2; fold++) {
+          addCurve(side, u => {
+            const angle = u * PI * 2;
+            const ripple = 1 + .21 * sin(3 * angle + seed) + .16 * cos(2 * angle - seed);
+            const radius = ripple * (1 - fold * .22);
+            return [latitude + radius * (.16 * sin(angle) + .045 * cos(angle)),
+              theta + radius * (.27 * cos(angle) + .095 * sin(angle))];
+          }, 1, seed * .093 + fold * .13);
+        }
+      }
     }
     for (let column = 0; column <= 14; column++) {
       const base = column * PI / 14;
@@ -134,7 +151,7 @@
         const scanDistance = screen[i + 1] - scanCenter;
         const scan = exp(-scanDistance * scanDistance * scanFalloff);
         const signal = sin(i * .030 - seconds * 3.1 + curve.seed * 12);
-        const level = max(0, min(5, Math.floor(1.6 + depth * 4.9 + curve.weight * .86 + scan * .85 + max(0, signal) * .56)));
+        const level = max(0, min(5, Math.floor(1.42 + depth * 4.65 + curve.weight * .86 + scan * 1.35 + max(0, signal) * .56)));
         bins[level].moveTo(screen[i - 3], screen[i - 2]);
         bins[level].lineTo(screen[i], screen[i + 1]);
         if (curve.weight && depth > .32 && i % 15 === 0 && signal > .985) {
@@ -166,7 +183,7 @@
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     centerX = width * (width > 800 ? .54 : .5);
     centerY = height * .455;
-    scale = min(height * .345, width * .53);
+    scale = min(height * .345, width * .465);
     draw();
   }
 
