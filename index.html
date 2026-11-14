@@ -1,505 +1,230 @@
-<!DOCTYPE html>
-
-<html lang="sr">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Imposter</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="umcaruje">
+<title>umcaruje</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#07080d;--surface:#0f1018;--surface2:#161820;
-  --red:#ff3b5c;--cyan:#27f5c0;--yellow:#ffd060;
-  --text:#eeeef5;--muted:#4a4b65;--border:#1f2035;--radius:12px;
-}
-body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
-  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
-  padding:24px 16px 40px;overflow-x:hidden;}
-body::after{content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:999;opacity:.6;}
-.glow-r{position:fixed;width:500px;height:500px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,59,92,.13) 0%,transparent 70%);
-  top:-150px;left:-100px;pointer-events:none;}
-.glow-c{position:fixed;width:400px;height:400px;border-radius:50%;
-  background:radial-gradient(circle,rgba(39,245,192,.08) 0%,transparent 70%);
-  bottom:-100px;right:-80px;pointer-events:none;}
-.wrap{width:100%;max-width:480px;position:relative;z-index:1;}
-
-/* HEADER */
-.logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;padding-top:8px;}
-.logo-icon{width:44px;height:44px;border-radius:50%;background:var(--red);
-display:flex;align-items:center;justify-content:center;font-size:1.3rem;
-box-shadow:0 0 24px rgba(255,59,92,.5);flex-shrink:0;}
-.logo h1{font-family:‘Syne’,sans-serif;font-size:clamp(2rem,9vw,3rem);font-weight:800;
-letter-spacing:-1px;background:linear-gradient(135deg,#fff 30%,rgba(255,255,255,.5));
--webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.tagline{text-align:center;font-size:.6rem;letter-spacing:.35em;color:var(--muted);
-text-transform:uppercase;margin-bottom:36px;}
-
-/* SCREENS */
-.screen{display:none;width:100%;animation:fadeUp .3s ease both;}
-.screen.active{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-padding:24px;margin-bottom:14px;position:relative;overflow:hidden;}
-.ca{position:absolute;top:0;left:0;right:0;height:3px;}
-.ca.r{background:linear-gradient(90deg,var(--red),#ff7096);}
-.ca.c{background:linear-gradient(90deg,var(--cyan),#60ffe0);}
-.ca.y{background:linear-gradient(90deg,var(--yellow),#ffe599);}
-
-.label{font-size:.58rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:block;}
-
-/* INPUTS */
-input[type=text],input[type=number]{width:100%;background:var(--surface2);
-border:1px solid var(--border);color:var(--text);font-family:‘DM Mono’,monospace;
-font-size:.9rem;padding:13px 15px;outline:none;border-radius:8px;
-transition:border-color .2s,box-shadow .2s;}
-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(39,245,192,.1);}
-.input-group{margin-bottom:20px;}
-
-/* PLAYER TAGS */
-.players-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.player-tag{background:var(--surface2);border:1px solid var(--border);
-padding:8px 14px;border-radius:30px;display:flex;align-items:center;gap:8px;
-font-size:.78rem;animation:fadeUp .25s ease;transition:border-color .2s;}
-.player-tag:hover{border-color:var(--muted);}
-.rm{color:var(--muted);cursor:pointer;font-size:.9rem;line-height:1;
-transition:color .2s;border:none;background:none;padding:0;font-family:inherit;}
-.rm:hover{color:var(--red);}
-.add-row{display:flex;gap:8px;margin-top:10px;}
-.add-row input{flex:1;}
-
-/* COUNTER */
-.counter-row{display:flex;align-items:center;gap:10px;}
-.counter-row input{width:72px;text-align:center;}
-.cbtn{width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);
-color:var(--text);font-size:1.3rem;cursor:pointer;border-radius:8px;
-transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:inherit;}
-.cbtn:hover{border-color:var(--cyan);color:var(--cyan);}
-
-/* TIMER PRESETS */
-.timer-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-.tpreset{padding:8px 14px;border-radius:30px;border:1px solid var(--border);
-background:var(--surface2);color:var(--muted);font-family:‘DM Mono’,monospace;
-font-size:.78rem;cursor:pointer;transition:all .2s;}
-.tpreset:hover,.tpreset.active{border-color:var(--cyan);color:var(--cyan);background:rgba(39,245,192,.07);}
-.tpreset.nop:hover,.tpreset.nop.active{border-color:var(--muted);color:var(--text);background:var(--surface2);}
-
-/* BUTTONS */
-.btn{font-family:‘Syne’,sans-serif;font-weight:700;letter-spacing:.05em;font-size:1rem;
-padding:14px 24px;border:none;cursor:pointer;border-radius:10px;
-transition:all .18s;text-transform:uppercase;width:100%;}
-.btn-r{background:var(--red);color:#fff;margin-top:6px;
-box-shadow:0 4px 24px rgba(255,59,92,.3);}
-.btn-r:hover{background:#ff5472;box-shadow:0 6px 32px rgba(255,59,92,.5);transform:translateY(-1px);}
-.btn-r:active{transform:none;}
-.btn-c{background:var(--cyan);color:#07080d;flex-shrink:0;width:auto;
-padding:13px 18px;font-size:.85rem;border-radius:8px;border:none;cursor:pointer;
-font-family:‘Syne’,sans-serif;font-weight:700;transition:all .18s;text-transform:uppercase;}
-.btn-c:hover{opacity:.85;}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--muted);
-margin-top:8px;font-size:.85rem;}
-.btn-g:hover{border-color:var(--muted);color:var(--text);}
-.err{color:var(--red);font-size:.65rem;letter-spacing:.15em;margin-top:6px;display:none;}
-
-/* PASS SCREEN */
-.pass-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-padding:36px 28px;text-align:center;position:relative;overflow:hidden;}
-.pass-dots{display:flex;justify-content:center;gap:7px;margin-bottom:28px;}
-.dot{height:4px;border-radius:2px;background:var(--border);transition:all .3s;flex:0 0 20px;}
-.dot.done{background:var(--cyan);opacity:.5;}
-.dot.cur{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
-.pname{font-family:‘Syne’,sans-serif;font-weight:800;
-font-size:clamp(2.2rem,9vw,3.5rem);letter-spacing:-1px;color:var(--cyan);
-margin-bottom:4px;line-height:1.1;}
-.pass-sub{font-size:.6rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:28px;}
-.reveal-area{border:2px dashed var(--border);border-radius:10px;padding:24px 16px;
-cursor:pointer;transition:all .25s;color:var(--muted);font-size:.8rem;
-letter-spacing:.15em;text-transform:uppercase;background:none;width:100%;font-family:inherit;}
-.reveal-area:hover{border-color:var(--red);color:var(--red);}
-.role-box{display:none;padding-top:20px;}
-.rbadge{display:inline-flex;align-items:center;gap:6px;font-size:.62rem;
-letter-spacing:.3em;padding:5px 14px;border-radius:30px;margin-bottom:18px;}
-.rbadge.imp{background:rgba(255,59,92,.12);color:var(--red);border:1px solid rgba(255,59,92,.25);}
-.rbadge.cit{background:rgba(39,245,192,.1);color:var(--cyan);border:1px solid rgba(39,245,192,.2);}
-.rword{font-family:‘Syne’,sans-serif;font-weight:800;
-font-size:clamp(2rem,9vw,3rem);letter-spacing:-1px;margin-bottom:10px;}
-.rword.iw{color:var(--muted);font-style:italic;font-size:1.8rem;}
-.rhint{font-size:.68rem;color:var(--muted);line-height:1.9;letter-spacing:.05em;}
-
-/* TIMER WIDGET */
-.timer-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;}
-.t-ring{position:relative;width:140px;height:140px;margin:0 auto 14px;}
-.t-ring svg{transform:rotate(-90deg);}
-.tbg{fill:none;stroke:var(--border);stroke-width:6;}
-.tarc{fill:none;stroke:var(--cyan);stroke-width:6;stroke-linecap:round;
-transition:stroke-dashoffset .9s linear,stroke .5s;}
-.tarc.warn{stroke:var(--yellow);}
-.tarc.danger{stroke:var(--red);animation:pring .6s ease infinite alternate;}
-@keyframes pring{from{opacity:1}to{opacity:.4}}
-.tnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.tnum span{font-family:‘Syne’,sans-serif;font-weight:800;font-size:2.4rem;line-height:1;letter-spacing:-2px;}
-.tnum small{font-size:.55rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
-.tctrl{display:flex;gap:10px;margin-top:4px;}
-.tcbtn{padding:9px 18px;border-radius:8px;border:1px solid var(--border);
-background:var(--surface2);color:var(--text);font-family:‘DM Mono’,monospace;
-font-size:.8rem;cursor:pointer;transition:all .2s;letter-spacing:.1em;}
-.tcbtn:hover{border-color:var(--cyan);color:var(--cyan);}
-.tcbtn.paused{border-color:var(--yellow);color:var(--yellow);}
-.t-exp{display:none;font-family:‘Syne’,sans-serif;font-weight:800;font-size:1.1rem;
-color:var(--red);letter-spacing:.05em;margin-top:10px;animation:blink 1s step-end infinite;}
-@keyframes blink{50%{opacity:0}}
-
-/* GAME */
-.gplayers{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.gchip{padding:7px 14px;border-radius:30px;font-size:.75rem;border:1px solid var(--border);background:var(--surface2);}
-.vote-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
-.vbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text);
-font-family:‘DM Mono’,monospace;font-size:.8rem;padding:13px 10px;
-cursor:pointer;border-radius:8px;transition:all .2s;text-align:center;}
-.vbtn:hover{border-color:var(--red);color:var(--red);background:rgba(255,59,92,.06);}
-
-/* RESULT */
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-padding:36px 28px;text-align:center;position:relative;overflow:hidden;}
-.res-emoji{font-size:3.5rem;margin-bottom:10px;display:block;}
-.res-title{font-family:‘Syne’,sans-serif;font-weight:800;
-font-size:clamp(2.2rem,10vw,4rem);letter-spacing:-1px;margin-bottom:6px;}
-.res-sub{font-size:.65rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;margin-bottom:24px;}
-.info-pill{background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-padding:18px 20px;margin-bottom:12px;text-align:left;}
-.info-pill .lbl{font-size:.58rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
-.info-pill .val{font-family:‘Syne’,sans-serif;font-weight:700;font-size:1.6rem;letter-spacing:-.5px;}
-.info-pill .val.r{color:var(--red);}
-.info-pill .val.c{color:var(--cyan);}
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #000; color: #fafafa; font-family: Geist, Arial, sans-serif; }
+  main { min-height: 100svh; display: grid; position: relative; isolation: isolate; overflow: hidden; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+  .identity { align-self: end; justify-self: start; z-index: 1; margin: clamp(22px, 4.1vw, 68px); pointer-events: none; }
+  h1 { font-size: clamp(42px, 7.2vw, 122px); line-height: .86; letter-spacing: -.085em; margin: 0; font-weight: 700; }
+  h1 span { color: #777; }
+  nav { position: absolute; z-index: 1; top: max(24px, env(safe-area-inset-top)); right: max(24px, env(safe-area-inset-right)); }
+  a, button { font: 11px/1.2 "Courier New", monospace; letter-spacing: .09em; color: #a8a8a8; }
+  a { display: inline-block; padding: 10px; text-decoration: none; }
+  a:hover, button:hover { color: #fff; }
+  a:focus-visible, button:focus-visible { outline: 1px solid #fff; outline-offset: 3px; }
+  button[hidden] { display: none; }
+  button { position: absolute; z-index: 1; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); background: #000; border: 1px solid #363636; padding: 10px 12px; cursor: pointer; }
+  canvas:active { cursor: grabbing; }
+  @media (max-width: 480px) {
+    nav { top: max(15px, env(safe-area-inset-top)); right: 12px; }
+    button { right: 16px; bottom: max(20px, env(safe-area-inset-bottom)); }
+  }
 </style>
-
 </head>
 <body>
-<div class="glow-r"></div>
-<div class="glow-c"></div>
-<div class="wrap">
-
-  <div class="logo">
-    <div class="logo-icon">🕵️</div>
-    <h1>IMPOSTER</h1>
-  </div>
-  <p class="tagline">igra otkrivanja · srpska verzija</p>
-
-  <!-- SETUP -->
-
-  <div class="screen active" id="screen-setup">
-    <div class="card">
-      <div class="ca c"></div>
-      <span class="label">Igrači (min. 3, max. 14)</span>
-      <div id="players-grid" class="players-grid"></div>
-      <div class="add-row">
-        <input type="text" id="player-input" placeholder="Ime igrača..." maxlength="18" autocomplete="off">
-        <button class="btn-c" onclick="addPlayer()">+ Dodaj</button>
-      </div>
-      <p class="err" id="err-players">Potrebno minimum 3 igrača!</p>
-    </div>
-<div class="card">
-  <div class="ca r"></div>
-  <span class="label">Broj impostera</span>
-  <div class="counter-row">
-    <button class="cbtn" onclick="changeImposters(-1)">−</button>
-    <input type="number" id="imposter-count" value="1" min="1" readonly>
-    <button class="cbtn" onclick="changeImposters(1)">+</button>
-  </div>
-</div>
-
-<div class="card">
-  <div class="ca y"></div>
-  <span class="label">Trajanje rasprave</span>
-  <div class="timer-presets">
-    <button class="tpreset nop active" onclick="selectTimer(this,0)">Bez tajmera</button>
-    <button class="tpreset" onclick="selectTimer(this,60)">1 min</button>
-    <button class="tpreset" onclick="selectTimer(this,120)">2 min</button>
-    <button class="tpreset" onclick="selectTimer(this,180)">3 min</button>
-    <button class="tpreset" onclick="selectTimer(this,300)">5 min</button>
-  </div>
-</div>
-
-<div class="card">
-  <div class="ca c"></div>
-  <span class="label">Pojam (prazno = random)</span>
-  <input type="text" id="custom-word" placeholder="npr. Burek, Kalemegdan, Zmaj..." maxlength="30" autocomplete="off">
-</div>
-
-<button class="btn btn-r" onclick="startGame()">🎮 Počni igru</button>
-  </div>
-
-  <!-- PASS -->
-
-  <div class="screen" id="screen-pass">
-    <div class="pass-card">
-      <div class="ca c"></div>
-      <div class="pass-dots" id="pass-dots"></div>
-      <p class="pass-sub">prosledi uređaj sledećem igraču</p>
-      <div class="pname" id="pass-pname"></div>
-      <p class="pass-sub" style="margin-bottom:24px;">pritisni da otkriješ svoju ulogu</p>
-      <button class="reveal-area" id="reveal-btn" onclick="revealRole()">👁&nbsp;&nbsp;OTKRIJ ULOGU</button>
-      <div class="role-box" id="role-box">
-        <div id="rbadge" class="rbadge"></div>
-        <div id="rword" class="rword"></div>
-        <p id="rhint" class="rhint"></p>
-        <button class="btn btn-r" style="margin-top:24px;" onclick="nextPlayer()" id="next-btn">Sledeći →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- GAME -->
-
-  <div class="screen" id="screen-game">
-<div class="card" id="timer-card" style="display:none;">
-  <div class="ca y"></div>
-  <span class="label" style="text-align:center;display:block;">Vreme za raspravu</span>
-  <div class="timer-wrap">
-    <div class="t-ring">
-      <svg width="140" height="140" viewBox="0 0 140 140">
-        <circle class="tbg" cx="70" cy="70" r="60"/>
-        <circle class="tarc" id="tarc" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="0"/>
-      </svg>
-      <div class="tnum">
-        <span id="tdisp">0:00</span>
-        <small id="tlbl">preostalo</small>
-      </div>
-    </div>
-    <div class="tctrl">
-      <button class="tcbtn" id="pause-btn" onclick="togglePause()">⏸ Pauza</button>
-      <button class="tcbtn" onclick="resetTimer()">↺ Reset</button>
-    </div>
-    <p class="t-exp" id="t-exp">⏰ VREME ISTEKLO!</p>
-  </div>
-</div>
-
-<div class="card">
-  <div class="ca c"></div>
-  <span class="label">Igrači</span>
-  <div class="gplayers" id="gplayers"></div>
-</div>
-
-<div class="card">
-  <div class="ca r"></div>
-  <span class="label">Glasanje — ko je imposter?</span>
-  <p style="font-size:.72rem;color:var(--muted);line-height:1.8;margin-top:4px;">
-    Razgovarajte, pitajte, posumnjajte...<br>Zatim izaberite ko je imposter.
-  </p>
-  <div class="vote-grid" id="vote-grid"></div>
-</div>
-
-<button class="btn btn-g" onclick="endGame(null)">Otkrij bez glasanja</button>
-  </div>
-
-  <!-- RESULT -->
-
-  <div class="screen" id="screen-result">
-    <div class="result-card">
-      <div class="ca" id="res-accent"></div>
-      <span class="res-emoji" id="res-emoji"></span>
-      <div class="res-title" id="res-title"></div>
-      <p class="res-sub" id="res-sub"></p>
-      <div class="info-pill">
-        <div class="lbl">Pojam je bio</div>
-        <div class="val c" id="res-word"></div>
-      </div>
-      <div class="info-pill">
-        <div class="lbl">Imposter</div>
-        <div class="val r" id="res-imposter"></div>
-      </div>
-      <button class="btn btn-r" style="margin-top:16px;" onclick="resetGame()">↺ Igraj ponovo</button>
-    </div>
-  </div>
-
-</div>
-
+<main>
+  <canvas aria-hidden="true"></canvas>
+  <nav aria-label="Projects"><a href="./imposter.html">IMPOSTER ↗</a></nav>
+  <div class="identity"><h1>umcaruje<span>.</span></h1></div>
+  <button type="button" hidden>PAUSE</button>
+</main>
 <script>
-const WORDS=[
-  "Kengur","Delfin","Hobotnica","Krokodil","Pingvin","Labud","Tarantula","Kolibrić",
-  "Flamingo","Orangutan","Kameleon","Platipus","Jež","Lenjivac","Tapir","Raža",
-  "Morž","Tukan","Geko","Piranja","Kondor","Noj","Alpaka","Lemur","Jelen","Medved",
-  "Sova","Lisica","Vuk","Šišmiš","Paun","Roda","Škorpija","Bison","Gepard",
-  "Pizza","Sendvič","Burek","Ćevapi","Sarma","Pljeskavica","Gibanica","Palačinka",
-  "Kifla","Tulumba","Baklava","Ajvar","Prebranac","Pasulj","Rakija","Krofna",
-  "Štrudla","Lepinja","Popara","Čorba","Karamela","Sladoled","Čokolada","Pita",
-  "Vulkan","Glečer","Tornado","Svemir","Džungla","Pustinja","Gejzir","Krater",
-  "Stalaktit","Koralj","Ajsberg","Monsun","Fjord","Laguna","Klanac","Morava",
-  "Dunav","Kopaonik","Tara","Đerdap","Aurora","Cunami","Meteor","Peščara",
-  "Teleskop","Kompas","Bumerang","Kaleidoskop","Semafor","Tramvaj","Balon",
-  "Zepelin","Satelit","Rendgen","Magnet","Pergament","Sablja","Harpun","Katapult",
-  "Metronom","Akordeon","Mandolina","Klavir","Bubanj","Harmonika","Violina","Truba",
-  "Lokomotiva","Podmornica","Periskop","Vrtuljak","Megafon","Dalekozor","Saksofon",
-  "Iglú","Labirint","Akvarijum","Fontana","Tvrđava","Manastir","Luster",
-  "Fenjer","Vatromet","Karavan","Hamam","Česma","Kula","Most","Mehana","Bazar",
-  "Mumija","Vilenjak","Džoker","Pirat","Patuljak","Vampir","Zmaj","Sfinga",
-  "Kentaur","Sirena","Gladijator","Astronaut","Ronilac","Akrobata","Žongler",
-  "Mađioničar","Šaman","Detektiv","Fakir","Nindža","Samuraj","Viking","Faraon",
-  "Slava","Gusle","Šajkača","Opanci","Tamburica","Kolo","Kalemegdan",
-  "Skadarlija","Vojvodina","Čobanin","Vodenica","Zadruga", "Čačak",
-  "Šumadija","Zlatibor","Užice","Niš","Subotica","Novi Sad","Studenica"
-];
+  const canvas = document.querySelector("canvas");
+  const context = canvas.getContext("2d");
+  const button = document.querySelector("button");
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const { PI, sin, cos, max, min, exp } = Math;
+  const curves = [];
+  const shades = [
+    "rgba(255,255,255,.045)", "rgba(255,255,255,.095)", "rgba(255,255,255,.19)",
+    "rgba(255,255,255,.34)", "rgba(255,255,255,.57)", "rgba(255,255,255,.85)"
+  ];
 
-let players=[],impostorCount=1,gameWord='',roles={},passIndex=0;
-let timerSec=0,timerTotal=0,timerInterval=null,timerPaused=false;
-
-const $=id=>document.getElementById(id);
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
-
-function renderPlayers(){
-  const g=$('players-grid');g.innerHTML='';
-  players.forEach((p,i)=>{
-    const d=document.createElement('div');d.className='player-tag';
-    d.innerHTML=`<span>${p}</span><button class="rm" onclick="removePlayer(${i})">×</button>`;
-    g.appendChild(d);
-  });
-}
-function addPlayer(){
-  const inp=$('player-input'),name=inp.value.trim();
-  if(!name||players.includes(name)||players.length>=14){inp.value='';return;}
-  players.push(name);inp.value='';renderPlayers();inp.focus();
-}
-$('player-input').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer();});
-function removePlayer(i){players.splice(i,1);renderPlayers();}
-function changeImposters(d){
-  let v=parseInt($('imposter-count').value)+d;
-  const max=Math.max(1,Math.floor(players.length/3));
-  $('imposter-count').value=Math.min(Math.max(1,v),max);
-}
-function selectTimer(el,sec){
-  document.querySelectorAll('.tpreset').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');timerTotal=sec;
-}
-
-function startGame(){
-  if(players.length<3){$('err-players').style.display='block';return;}
-  $('err-players').style.display='none';
-  impostorCount=parseInt($('imposter-count').value);
-  const cw=$('custom-word').value.trim();
-  gameWord=cw||WORDS[Math.floor(Math.random()*WORDS.length)];
-  roles={};
-  [...players].sort(()=>Math.random()-.5).forEach((p,i)=>{roles[p]=i<impostorCount?'imposter':'citizen';});
-  passIndex=0;setupPass();showScreen('screen-pass');
-}
-
-function setupPass(){
-  const dots=$('pass-dots');dots.innerHTML='';
-  players.forEach((_,i)=>{
-    const d=document.createElement('div');
-    d.className='dot'+(i<passIndex?' done':i===passIndex?' cur':'');
-    dots.appendChild(d);
-  });
-  $('pass-pname').textContent=players[passIndex];
-  $('reveal-btn').style.display='block';
-  $('role-box').style.display='none';
-}
-function revealRole(){
-  const p=players[passIndex],isImp=roles[p]==='imposter';
-  $('reveal-btn').style.display='none';
-  const b=$('rbadge');b.className='rbadge '+(isImp?'imp':'cit');
-  b.textContent=isImp?'☠ IMPOSTER':'✦ GRAĐANIN';
-  const rw=$('rword');rw.className='rword'+(isImp?' iw':'');
-  rw.textContent=isImp?'???':gameWord;
-  rw.style.color=isImp?'var(--muted)':'var(--cyan)';
-  $('rhint').textContent=isImp
-    ?'Ne znaš pojam. Pokušaj da se ne izdaš i blefuj!'
-    :'Ovo je tvoj pojam. Čuvaj ga od impostera!';
-  $('next-btn').textContent=passIndex<players.length-1?'Sledeći igrač →':'🎮 Počni raspravu!';
-  $('role-box').style.display='block';
-}
-function nextPlayer(){
-  passIndex++;
-  if(passIndex>=players.length){setupGame();showScreen('screen-game');}
-  else setupPass();
-}
-
-function setupGame(){
-  const gp=$('gplayers');gp.innerHTML='';
-  players.forEach(p=>{const c=document.createElement('div');c.className='gchip';c.textContent=p;gp.appendChild(c);});
-  const vg=$('vote-grid');vg.innerHTML='';
-  players.forEach(p=>{
-    const b=document.createElement('button');b.className='vbtn';b.textContent=p;
-    b.onclick=()=>endGame(p);vg.appendChild(b);
-  });
-  stopTimer();
-  if(timerTotal>0){
-    $('timer-card').style.display='block';
-    timerSec=timerTotal;timerPaused=false;
-    updateTimer();startTimerLoop();
-    $('pause-btn').textContent='⏸ Pauza';$('pause-btn').classList.remove('paused');
-    $('t-exp').style.display='none';$('tlbl').textContent='preostalo';
-  } else {
-    $('timer-card').style.display='none';
+  // Each hemisphere has its own folded contour with a gap along the midline.
+  function surface(side, latitude, theta) {
+    const y = sin(latitude);
+    const radius = cos(latitude);
+    const phase = side === 1 ? 0.82 : 0;
+    const fold = 6.6 * theta + 5.1 * latitude + 1.7 * sin(3 * latitude - 2 * theta + phase);
+    const fine = 11 * latitude - 5 * theta + 1.4 * cos(5 * theta + phase);
+    const crease = Math.pow(.5 + .5 * cos(fold + .38 * sin(fine)), 5);
+    const volume = 1 + .052 * sin(5 * theta - 8 * latitude + phase) - .126 * crease;
+    return [
+      side * (.037 + .028 * y * y + .84 * radius * sin(theta) * volume * (1 + .09 * y)),
+      .98 * y + .066 * radius * sin(3 * theta + 6 * latitude + phase),
+      .58 * radius * cos(theta) * volume + .06 * y
+    ];
   }
-}
 
-const CIRC=2*Math.PI*60;
-function updateTimer(){
-  const m=Math.floor(timerSec/60),s=timerSec%60;
-  $('tdisp').textContent=`${m}:${s.toString().padStart(2,'0')}`;
-  const pct=timerTotal>0?timerSec/timerTotal:1;
-  const arc=$('tarc');
-  arc.style.strokeDashoffset=CIRC*(1-pct);
-  arc.className='tarc'+(pct<=.2?' danger':pct<=.4?' warn':'');
-}
-function startTimerLoop(){
-  timerInterval=setInterval(()=>{
-    if(timerPaused)return;
-    timerSec--;updateTimer();
-    if(timerSec<=0){
-      stopTimer();$('t-exp').style.display='block';$('tlbl').textContent='isteklo';
-      try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}
+  function addCurve(side, sample, weight, seed) {
+    const points = [];
+    for (let step = 0; step <= 52; step++) points.push(surface(side, ...sample(step / 52)));
+    curves.push({ points, weight, seed, projected: new Float32Array(points.length * 3) });
+  }
+
+  for (const side of [-1, 1]) {
+    for (let row = 0; row < 32; row++) {
+      const base = -1.42 + row * 2.84 / 31;
+      const band = row % 4 === 0;
+      addCurve(side, u => {
+        const a = u * PI;
+        const wave = .088 * sin(4 * a + base * 6 + side * .4) + .041 * sin(9 * a - base * 11);
+        return [base + sin(a) * wave * cos(base), a];
+      }, band ? 1 : 0, row * .113 + side * .32);
     }
-  },1000);
-}
-function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
-function togglePause(){
-  timerPaused=!timerPaused;
-  const b=$('pause-btn');
-  if(timerPaused){b.textContent='▶ Nastavi';b.classList.add('paused');}
-  else{b.textContent='⏸ Pauza';b.classList.remove('paused');}
-}
-function resetTimer(){
-  stopTimer();timerPaused=false;timerSec=timerTotal;updateTimer();
-  $('t-exp').style.display='none';$('tlbl').textContent='preostalo';
-  $('pause-btn').textContent='⏸ Pauza';$('pause-btn').classList.remove('paused');
-  startTimerLoop();
-}
-
-function endGame(voted){
-  stopTimer();
-  const imposters=players.filter(p=>roles[p]==='imposter');
-  $('res-word').textContent=gameWord;
-  $('res-imposter').textContent=imposters.join(', ');
-  const acc=$('res-accent'),ttl=$('res-title');
-  if(voted===null){
-    $('res-emoji').textContent='🔍';ttl.textContent='OTKRIVENO';
-    ttl.style.color='var(--cyan)';$('res-sub').textContent='Igra završena bez glasanja';
-    acc.className='ca c';
-  } else if(imposters.includes(voted)){
-    $('res-emoji').textContent='🎉';ttl.textContent='POBEDA!';
-    ttl.style.color='var(--cyan)';$('res-sub').textContent='Građani su pronašli impostera!';
-    acc.className='ca c';
-  } else {
-    $('res-emoji').textContent='💀';ttl.textContent='IMPOSTER POBEDIO';
-    ttl.style.color='var(--red)';
-    $('res-sub').textContent=`${voted} je eliminisan, ali nije bio imposter`;
-    acc.className='ca r';
+    // Local looping folds give the surface its irregular gyri.
+    for (let row = 0; row < 6; row++) {
+      for (let column = 0; column < 5; column++) {
+        const seed = row * 5 + column + side * 37;
+        const latitude = -.99 + row * .39 + .075 * sin(seed * 3.17);
+        const theta = .26 + column * .65 + .115 * sin(seed * 1.91);
+        for (let fold = 0; fold < 2; fold++) {
+          addCurve(side, u => {
+            const angle = u * PI * 2;
+            const ripple = 1 + .21 * sin(3 * angle + seed) + .16 * cos(2 * angle - seed);
+            const radius = ripple * (1 - fold * .22);
+            return [latitude + radius * (.16 * sin(angle) + .045 * cos(angle)),
+              theta + radius * (.27 * cos(angle) + .095 * sin(angle))];
+          }, 1, seed * .093 + fold * .13);
+        }
+      }
+    }
+    for (let column = 0; column <= 14; column++) {
+      const base = column * PI / 14;
+      addCurve(side, u => {
+        const a = -1.47 + u * 2.94;
+        return [a, base + sin(base) * (.10 * sin(a * 7 + base * 4) + .045 * cos(a * 15 - base * 5))];
+      }, column % 7 === 0 ? 1 : 0, column * .173 + side * .19);
+    }
   }
-  showScreen('screen-result');
-}
 
-function resetGame(){
-  stopTimer();gameWord='';roles={};passIndex=0;
-  $('custom-word').value='';renderPlayers();showScreen('screen-setup');
-}
+  let width, height, scale, centerX, centerY, pixelRatio;
+  let paused = motion.matches;
+  let frameId = 0;
+  let previousTime = 0;
+  let seconds = 0;
+  let targetYaw = 0, targetPitch = 0, yaw = 0, pitch = 0;
+  let drag = null;
+  const bins = shades.map(() => new Path2D());
+  const stars = Array.from({ length: 55 }, (_, i) => [
+    ((i * .61803398875) % 1), ((i * .41421356237) % 1), i % 13 === 0
+  ]);
 
-renderPlayers();
+  function draw() {
+    context.clearRect(0, 0, width, height);
+    for (const [x, y, bright] of stars) {
+      context.fillStyle = bright ? "#555" : "#222";
+      context.fillRect(Math.round(x * width), Math.round(y * height), 1, 1);
+    }
+
+    const turn = .28 + .46 * sin(seconds * .44) + yaw;
+    const tilt = -.12 + .11 * cos(seconds * .37) + pitch;
+    const ct = cos(turn), st = sin(turn), cp = cos(tilt), sp = sin(tilt);
+    const pulse = 1 + .012 * sin(seconds * 2.4);
+    const scanCenter = centerY + sin(seconds * .83) * .75 * scale;
+    const scanFalloff = 38 / (scale * scale);
+    for (let i = 0; i < bins.length; i++) bins[i] = new Path2D();
+    const sparks = new Path2D();
+    for (const curve of curves) {
+      const screen = curve.projected;
+      for (let i = 0; i < curve.points.length; i++) {
+        const [x, y, z] = curve.points[i];
+        const rotatedX = ct * x + st * z;
+        const depth = -st * x + ct * z;
+        const rotatedY = cp * y - sp * depth;
+        const rotatedZ = sp * y + cp * depth;
+        const zoom = scale * pulse / (1 - .2 * rotatedZ);
+        const offset = i * 3;
+        screen[offset] = centerX + zoom * rotatedX;
+        screen[offset + 1] = centerY - zoom * rotatedY;
+        screen[offset + 2] = rotatedZ;
+      }
+      for (let i = 3; i < screen.length; i += 3) {
+        const depth = (screen[i - 1] + screen[i + 2]) * .5;
+        const scanDistance = screen[i + 1] - scanCenter;
+        const scan = exp(-scanDistance * scanDistance * scanFalloff);
+        const signal = sin(i * .030 - seconds * 3.1 + curve.seed * 12);
+        const level = max(0, min(5, Math.floor(1.42 + depth * 4.65 + curve.weight * .86 + scan * 1.35 + max(0, signal) * .56)));
+        bins[level].moveTo(screen[i - 3], screen[i - 2]);
+        bins[level].lineTo(screen[i], screen[i + 1]);
+        if (curve.weight && depth > .32 && i % 15 === 0 && signal > .985) {
+          sparks.moveTo(screen[i] + 1.3, screen[i + 1]);
+          sparks.arc(screen[i], screen[i + 1], 1.3, 0, PI * 2);
+        }
+      }
+    }
+    context.lineCap = "round";
+    for (let i = 0; i < bins.length; i++) {
+      context.strokeStyle = shades[i];
+      context.lineWidth = i > 3 ? 1.05 : .7;
+      context.stroke(bins[i]);
+    }
+    context.shadowBlur = 8;
+    context.shadowColor = "#fff";
+    context.strokeStyle = "rgba(255,255,255,.39)";
+    context.stroke(bins[5]);
+    context.fillStyle = "#fff";
+    context.fill(sparks);
+    context.shadowBlur = 0;
+  }
+
+  function resize() {
+    ({ width, height } = canvas.getBoundingClientRect());
+    pixelRatio = min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * pixelRatio);
+    canvas.height = Math.round(height * pixelRatio);
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    centerX = width * (width > 800 ? .54 : .5);
+    centerY = height * .455;
+    scale = min(height * .345, width * .465);
+    draw();
+  }
+
+  function animate(now) {
+    const elapsed = previousTime ? min((now - previousTime) / 1000, .04) : 0;
+    previousTime = now;
+    seconds += elapsed;
+    const easing = 1 - exp(-elapsed * 9);
+    yaw += (targetYaw - yaw) * easing;
+    pitch += (targetPitch - pitch) * easing;
+    draw();
+    frameId = requestAnimationFrame(animate);
+  }
+
+  function syncMotion() {
+    button.textContent = paused ? "PLAY" : "PAUSE";
+    cancelAnimationFrame(frameId);
+    previousTime = 0;
+    if (!paused && !document.hidden) frameId = requestAnimationFrame(animate);
+  }
+
+  if (context) {
+    button.hidden = false;
+    button.addEventListener("click", () => { paused = !paused; syncMotion(); });
+    motion.addEventListener("change", () => { paused = motion.matches; syncMotion(); });
+    document.addEventListener("visibilitychange", syncMotion);
+    new ResizeObserver(resize).observe(canvas);
+    canvas.addEventListener("pointerdown", event => {
+      if (paused || !event.isPrimary || event.button !== 0) return;
+      drag = { x: event.clientX, y: event.clientY, yaw: targetYaw, pitch: targetPitch };
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener("pointermove", event => {
+      if (!drag || paused || !event.isPrimary) return;
+      targetYaw = drag.yaw + (event.clientX - drag.x) * .009;
+      targetPitch = max(-1.4, min(1.4, drag.pitch + (event.clientY - drag.y) * .009));
+    });
+    canvas.addEventListener("lostpointercapture", () => { drag = null; });
+    resize();
+    syncMotion();
+  }
 </script>
-
 </body>
 </html>
