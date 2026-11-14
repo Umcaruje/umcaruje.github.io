@@ -78,37 +78,59 @@ const material=new THREE.ShaderMaterial({
   float front=smoothstep(-.15,.65,vFacing);
   float wave=sin(vPosition.y*5.+vPosition.x*2.-uTime*1.7);
   float pulse=pow(max(0.,wave),12.);
-  float brightness=mix(.055,.48,front)+pulse*mix(.025,.28,front);
+  float brightness=mix(.025,.42,front)+pulse*mix(.015,.24,front);
   gl_FragColor=vec4(vec3(1.),brightness);
  }`
 });
-// Intersect anatomy triangles with gently warped contour planes.
-// The result is a hollow collection of lines, not stripes drawn on a solid.
+// Trace equal-curvature paths along the gyri, not horizontal slices.
+// Curvature comes from changes in the anatomical surface normals.
 function traceContours(geometry){
  const p=geometry.attributes.position,n=geometry.attributes.normal,index=geometry.index;
- const positions=[],normals=[],step=.045;
- const count=index?index.count:p.count;
- const vertex=k=>{
-  const i=index?index.getX(k):k;
-  const x=p.getX(i),y=p.getY(i),z=p.getZ(i);
-  return {p:[x,y,z],n:[n.getX(i),n.getY(i),n.getZ(i)],
-   level:y+.07*Math.sin(x*5.+z*2.)+.035*Math.sin(z*7.-x*3.)};
- };
+ const count=index?index.count:p.count,vertexCount=p.count;
+ const neighbors=Array.from({length:vertexCount},()=>new Set());
+ const ids=[];
  for(let t=0;t<count;t+=3){
-  const tri=[vertex(t),vertex(t+1),vertex(t+2)];
-  const lo=Math.min(...tri.map(v=>v.level)),hi=Math.max(...tri.map(v=>v.level));
-  for(let plane=Math.ceil(lo/step)*step;plane<hi;plane+=step){
+  const tri=[0,1,2].map(j=>index?index.getX(t+j):t+j);ids.push(tri);
+  for(let j=0;j<3;j++){const u=tri[j],v=tri[(j+1)%3];neighbors[u].add(v);neighbors[v].add(u);}
+ }
+ let curvature=new Float32Array(vertexCount);
+ for(let i=0;i<vertexCount;i++){
+  let sum=0,weight=0;
+  for(const j of neighbors[i]){
+   const dx=p.getX(j)-p.getX(i),dy=p.getY(j)-p.getY(i),dz=p.getZ(j)-p.getZ(i);
+   const length2=dx*dx+dy*dy+dz*dz;
+   if(length2<1e-12)continue;
+   const dnX=n.getX(j)-n.getX(i),dnY=n.getY(j)-n.getY(i),dnZ=n.getZ(j)-n.getZ(i);
+   const k=(dnX*dx+dnY*dy+dnZ*dz)/length2;
+   sum+=Math.max(-30,Math.min(30,k));weight++;
+  }
+  curvature[i]=weight?sum/weight:0;
+ }
+ // Suppress triangulation noise, keeping broad ridges and sulci.
+ for(let pass=0;pass<3;pass++){
+  const smoothed=new Float32Array(vertexCount);
+  for(let i=0;i<vertexCount;i++){
+   let sum=0;for(const j of neighbors[i])sum+=curvature[j];
+   smoothed[i]=neighbors[i].size?curvature[i]*.5+sum/neighbors[i].size*.5:curvature[i];
+  }
+  curvature=smoothed;
+ }
+ const positions=[],normals=[];
+ // A few nested contours wrap each actual ridge instead of filling a grid.
+ for(const tri of ids){
+  for(const level of [-2.0,.8,3.2]){
    const hits=[];
    for(let edge=0;edge<3;edge++){
-    const a=tri[edge],b=tri[(edge+1)%3];
-    if((a.level<=plane&&b.level>plane)||(b.level<=plane&&a.level>plane)){
-     const f=(plane-a.level)/(b.level-a.level);
-     hits.push({p:a.p.map((v,j)=>v+(b.p[j]-v)*f),n:a.n.map((v,j)=>v+(b.n[j]-v)*f)});
+    const i=tri[edge],j=tri[(edge+1)%3],a=curvature[i],b=curvature[j];
+    if((a<=level&&b>level)||(b<=level&&a>level)){
+     const f=(level-a)/(b-a);
+     hits.push({
+      p:[p.getX(i)+(p.getX(j)-p.getX(i))*f,p.getY(i)+(p.getY(j)-p.getY(i))*f,p.getZ(i)+(p.getZ(j)-p.getZ(i))*f],
+      n:[n.getX(i)+(n.getX(j)-n.getX(i))*f,n.getY(i)+(n.getY(j)-n.getY(i))*f,n.getZ(i)+(n.getZ(j)-n.getZ(i))*f]
+     });
     }
    }
-   if(hits.length===2){
-    for(const hit of hits){positions.push(...hit.p);normals.push(...hit.n);}
-   }
+   if(hits.length===2)for(const hit of hits){positions.push(...hit.p);normals.push(...hit.n);}
   }
  }
  const lines=new THREE.BufferGeometry();
