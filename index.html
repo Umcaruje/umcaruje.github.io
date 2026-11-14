@@ -79,10 +79,20 @@ const material=new THREE.ShaderMaterial({
  varying float vFacing; varying vec3 vPosition;
  void main(){
   float front=smoothstep(-.15,.65,vFacing);
-  float wave=sin(vPosition.y*5.+vPosition.x*2.-uTime*1.7);
-  float pulse=pow(max(0.,wave),12.);
-  float brightness=mix(.018,.64,front)+pulse*mix(.008,.18,front);
-  gl_FragColor=vec4(vec3(1.),brightness);
+  // The pulse moves from anatomical bottom to top, staying on the contours.
+  // Slightly offset paths prevent a single rigid horizontal scanning bar.
+  float lane=.045*sin(vPosition.x*5.+vPosition.z*3.)
+             +.025*sin(vPosition.z*8.-vPosition.x*2.);
+  float travel=uTime*.24-(vPosition.y+1.5)/3.+lane;
+  float phase=fract(travel+.5)-.5;
+  float head=exp(-pow(phase/.018,2.));
+  // Positive phase is the already-traversed, lower part of each line.
+  float tail=exp(-max(phase,0.)/.065)*smoothstep(0.,.012,phase);
+  float current=head+tail*.42;
+  float sparkle=pow(.5+.5*sin(vPosition.x*47.+vPosition.z*39.+vPosition.y*29.-uTime*7.),8.)*head*.22;
+  float base=mix(.012,.38,front);
+  float brightness=base+(current+sparkle)*mix(.11,.90,front);
+  gl_FragColor=vec4(vec3(1.),min(brightness,1.));
  }`
 });
 // Trace equal-curvature paths along the gyri, not horizontal slices.
